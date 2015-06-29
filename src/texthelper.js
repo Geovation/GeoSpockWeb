@@ -11,15 +11,15 @@
  * sdk text helper class
  */
 (function(root) {
-    root.WikiSampleSDK = root.WikiSampleSDK || {};
-    var WikiSampleSDK = root.WikiSampleSDK;
+    root.GeoSpockWeb = root.GeoSpockWeb || {};
+    var GeoSpockWeb = root.GeoSpockWeb;
 
     /**
-     * @namespace Provides an interface to WikiSampleSDK's wiki text processing helper.
+     * @namespace Provides an interface to GeoSpockWeb's wiki text processing helper.
      */
-    WikiSampleSDK.WikiTextHelper = WikiSampleSDK.WikiTextHelper || {};
+    GeoSpockWeb.WikiTextHelper = GeoSpockWeb.WikiTextHelper || {};
 
-    WikiSampleSDK.WikiTextHelper._upperCase = function(content) {
+    GeoSpockWeb.WikiTextHelper._upperCase = function(content) {
         return content.toUpperCase();
     };
 }(this));

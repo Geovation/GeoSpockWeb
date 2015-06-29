@@ -8,6 +8,7 @@
  */
 
 var gulp = require('gulp');
+var bower = require('gulp-bower');
 var args   = require('yargs').argv;
 var gutil = require('gulp-util');
 var concat = require('gulp-concat');
@@ -42,7 +43,11 @@ gulp.task('default', tasklist.withFilters(function(task) {
  * ***********************************************************************************************
  */
 
-gulp.task('build', ['clean'], function (cb) {
+gulp.task('bower', function() {
+ return bower();
+});
+
+gulp.task('build', ['clean', 'bower'], function (cb) {
     var pkg = require('./package.json');
 
     return gulp.src('./src/*.js')
@@ -71,7 +76,7 @@ gulp.task('bump-major', function(cb) {
     bumpHelper('major', cb);
 });
 
-gulp.task('test', ['lint', 'karma-tests']);
+gulp.task('test', ['bower', 'lint', 'karma-tests']);
 
 /*
  * gulp helper tasks

@@ -18,9 +18,10 @@
     "api",
     "javascript"
   ],
-  "dependenciesDev": {
+  "devDependencies": {
     "colors": "^1.1.2",
     "gulp": "^3.9.0",
+    "gulp-bower": "0.0.10",
     "gulp-bump": "^0.3.1",
     "gulp-clean": "^0.3.1",
     "gulp-concat": "^2.6.0",
@@ -49,5 +50,6 @@
     "node": "~0.12",
     "npm": "2.11.2"
   },
+  "license": "MIT",
   "readmeFilename": "README.md"
 }

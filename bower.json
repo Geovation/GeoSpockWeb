@@ -1,0 +1,30 @@
+{
+  "name": "GeoSpockSDK",
+  "version": "0.0.2",
+  "homepage": "https://github.com/Geovation/GeoSpockWeb",
+  "authors": [
+    "Sebastian Ovide <Sebastian.Ovide@geovation.uk>"
+  ],
+  "description": "JS SDK for using GeoSpock API on the Web",
+  "main": "geospockweb.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "sdk",
+    "geospock",
+    "api",
+    "javascript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  }
+}

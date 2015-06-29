@@ -14,7 +14,8 @@ module.exports = function(config){
             'src/*/*/*/*.js',
             'src/*/*/*.js',
             'src/*/*.js',
-            'src/**/*.js'
+            'src/**/*.js',
+            'bower_components/jquery/dist/jquery.min.js'
         ],
 
         // list of files to exclude

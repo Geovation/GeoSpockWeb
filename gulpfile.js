@@ -26,6 +26,7 @@ var exec = require('child_process').exec;
 var sys = require('sys');
 var tasklist = require('gulp-task-listing');
 var runSequence = require('run-sequence');
+var karma = require('karma').server;
 
 var PROJECT_BASE_PATH = __dirname + '';
 
@@ -154,10 +155,16 @@ gulp.task('lint', function (cb) {
 gulp.task('karma-tests', function(cb){
     console.log();
     console.log('Run all the tests now');
-    var karmaConfigFile = PROJECT_BASE_PATH+'/test/karma.conf.js';
-    var commandLine = 'karma start '+karmaConfigFile;
-    executeCommand(commandLine, cb);
-    console.log();
+
+    karma.start(
+      {
+        configFile: __dirname + '/test/karma.conf.js',
+        singleRun: true
+      }, function() {
+        console.log("End Karma" );
+      }
+    );
+
 });
 
 /*

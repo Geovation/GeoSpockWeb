@@ -1,5 +1,5 @@
 /**
- * this is the main task runner for managing the SampleSDK
+ * this is the main task runner for managing the GeoVationWeb
  */
 
 /*
@@ -134,7 +134,7 @@ gulp.task('example-upgrade-tag', function(){
     var file = 'example/*.html';
 
     return gulp.src([file])
-        .pipe(replace(/javascript-sdk-boilerplate-([\d.]+)\.js/g, 'javascript-sdk-boilerplate-' + v + '.js'))
+        .pipe(replace(/geospockweb-([\d.]+)\.js/g, 'geospockweb-' + v + '.js'))
         .pipe(gulp.dest('example'));
 });
 

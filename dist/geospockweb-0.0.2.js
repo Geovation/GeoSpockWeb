@@ -21,8 +21,8 @@ window.console.log = this.console.log || function() {};
  * expose our sdk
  */
 (function(root) {
-  root.WikiSampleSDK = root.WikiSampleSDK || {};
-  root.WikiSampleSDK.VERSION = "js1.0.0";
+  root.GeoVationWeb = root.GeoVationWeb || {};
+  root.GeoVationWeb.VERSION = "js1.0.0";
 }(this));
 
 /**
@@ -30,54 +30,54 @@ window.console.log = this.console.log || function() {};
  */
 (function(root) {
 
-    root.WikiSampleSDK = root.WikiSampleSDK || {};
+    root.GeoVationWeb = root.GeoVationWeb || {};
 
     /**
-    * Contains all WikiSampleSDK API classes and functions.
-    * @name WikiSampleSDK
+    * Contains all GeoVationWeb API classes and functions.
+    * @name GeoVationWeb
     * @namespace
     *
-    * Contains all WikiSampleSDK API classes and functions.
+    * Contains all GeoVationWeb API classes and functions.
     */
-    var WikiSampleSDK = root.WikiSampleSDK;
+    var GeoVationWeb = root.GeoVationWeb;
 
     // If jQuery has been included, grab a reference to it.
     if (typeof(root.$) !== "undefined") {
-        WikiSampleSDK.$ = root.$;
+        GeoVationWeb.$ = root.$;
     }
 
-    // Set the server for WikiSampleSDK to talk to.
-    WikiSampleSDK.serverURL = "https://en.wikipedia.org";
+    // Set the server for GeoVationWeb to talk to.
+    GeoVationWeb.serverURL = "https://en.wikipedia.org";
 
     /**
      * Call this method first to set your authentication key.
      * @param {String} API Token
      */
-    WikiSampleSDK.Initialize = function(apiToken) {
-        WikiSampleSDK._initialize(apiToken);
+    GeoVationWeb.Initialize = function(apiToken) {
+        GeoVationWeb._initialize(apiToken);
     };
 
     /**
      * Get data according to a wikipedia page.
      * @param {string} title of a wikipedia page like 'Cheese'
      */
-    WikiSampleSDK.GetPage = function(title) {
-      WikiSampleSDK._requestSample(title, function(data) {
+    GeoVationWeb.GetPage = function(title) {
+      GeoVationWeb._requestSample(title, function(data) {
         var rawtext = data.query.pages[Object.keys(data.query.pages)[0]].revisions[0]["*"];
-        var upperCaseTest = WikiSampleSDK.WikiTextHelper._upperCase(rawtext);
+        var upperCaseTest = GeoVationWeb.WikiTextHelper._upperCase(rawtext);
 
-        WikiSampleSDK.$( "body" ).append( '<p>'+title+':</p>' );
-        WikiSampleSDK.$( "body" ).append( '<p>'+rawtext.substring(0, 250)+'</p>' );
-        WikiSampleSDK.$( "body" ).append( '<p>'+upperCaseTest.substring(0, 250)+'</p>' );
+        GeoVationWeb.$( "body" ).append( '<p>'+title+':</p>' );
+        GeoVationWeb.$( "body" ).append( '<p>'+rawtext.substring(0, 250)+'</p>' );
+        GeoVationWeb.$( "body" ).append( '<p>'+upperCaseTest.substring(0, 250)+'</p>' );
       });
     };
 
     /**
-     * This method is for WikiSampleSDK's own private use.
+     * This method is for GeoVationWeb's own private use.
      * @param {String} API Token
      */
-    WikiSampleSDK._initialize = function(apiToken) {
-        WikiSampleSDK.apiToken = apiToken;
+    GeoVationWeb._initialize = function(apiToken) {
+        GeoVationWeb.apiToken = apiToken;
     };
 
     /**
@@ -85,16 +85,16 @@ window.console.log = this.console.log || function() {};
      * @param  {string} title
      * @param  {function} successCallback
      */
-    WikiSampleSDK._requestSample = function(title, successCallback) {
+    GeoVationWeb._requestSample = function(title, successCallback) {
 
-        var url = WikiSampleSDK.serverURL+
+        var url = GeoVationWeb.serverURL+
                   "/w/api.php?rvprop=content&format=json&prop=revisions|categories&rvprop=content&action=query&titles="+
                   encodeURI(title)+
                   "&token="+
-                  encodeURI(WikiSampleSDK.apiToken);
+                  encodeURI(GeoVationWeb.apiToken);
 
         var jqxhr =
-          WikiSampleSDK.$.ajax({
+          GeoVationWeb.$.ajax({
               url: url,
               dataType: 'jsonp',
               type: 'GET'

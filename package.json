@@ -18,7 +18,7 @@
     "api",
     "javascript"
   ],
-  "dependencies": {
+  "dependenciesDev": {
     "colors": "^1.1.2",
     "gulp": "^3.9.0",
     "gulp-bump": "^0.3.1",
@@ -49,10 +49,5 @@
     "node": "~0.12",
     "npm": "2.11.2"
   },
-  "gitHead": "e7866696b45b08d4567850b08f5fc44314862bd3",
-  "readmeFilename": "README.md",
-  "_id": "javascript-sdk-geospock@0.0.1",
-  "_shasum": "xxx",
-  "_from": "git@github.com:Geovation/GeoSpockWeb.git#v0.1.0",
-  "_resolved": "git@github.com:Geovation/GeoSpockWeb.git#xxx"
+  "readmeFilename": "README.md"
 }

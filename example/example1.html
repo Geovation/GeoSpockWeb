@@ -13,20 +13,20 @@
     </style>
     <title>Usage example for the javascript-sdk-boilerplate</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script src="https://rawgit.com/monbro/javascript-sdk-boilerplate/master/dist/javascript-sdk-boilerplate-0.0.2.js"></script>
+    <script src="https://github.com/Geovation/GeoSpockWeb/blob/master/dist/geospockweb-0.0.2.js"></script>
     <!-- load file locally if possibleand override the external from github -->
-    <script src="../dist/javascript-sdk-boilerplate-0.0.2.js"></script>
+    <script src="../dist/geospockweb-0.0.2.js"></script>
     <script>
         // initialize the sdk by giving your personal api token
-        WikiSampleSDK.Initialize('someRandomApiKey');
+        GeoVationWeb.Initialize('someRandomApiKey');
 
         // use the sdk for your needs, this call should print data from wikipedia about cheese in the console
-        WikiSampleSDK.GetPage('Cheese');
+        GeoVationWeb.GetPage('Cheese');
     </script>
   </head>
   <body>
     <h1>Hello World</h1>
-    <p>Have a look in the console, we should have received some data from wikipedia.</p>
-    <p>Find out more at <a href="https://github.com/monbro/javascript-sdk-boilerplate">github.com/monbro/javascript-sdk-boilerplate</a></p>
+    <p>Have a look in the console, we should have received data from GeoSpock.</p>
+    <p>Find out more at <a href="https://github.com/Geovation/GeoSpockWeb">https://github.com/Geovation/GeoSpockWeb</a></p>
   </body>
 </html>

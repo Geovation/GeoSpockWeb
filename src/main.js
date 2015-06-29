@@ -22,7 +22,7 @@ window.console.log = this.console.log || function() {};
  */
 (function(root) {
   root.GeoVationWeb = root.GeoVationWeb || {};
-  root.GeoVationWeb.VERSION = "js1.0.0";
+  root.GeoVationWeb.VERSION = "js1.0.0"; // TODO: gulp build should change it.
 }(this));
 
 /**

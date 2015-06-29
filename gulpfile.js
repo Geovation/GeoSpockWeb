@@ -27,6 +27,7 @@ var sys = require('sys');
 var tasklist = require('gulp-task-listing');
 var runSequence = require('run-sequence');
 var karma = require('karma').server;
+var jeditor = require("gulp-json-editor");
 
 var PROJECT_BASE_PATH = __dirname + '';
 
@@ -48,13 +49,16 @@ gulp.task('bower', function() {
  return bower();
 });
 
-gulp.task('build', ['clean', 'bower'], function (cb) {
+gulp.task('build', ['clean', 'bower', 'test'], function (cb) {
     var pkg = require('./package.json');
 
     return gulp.src('./src/*.js')
-        .pipe(concat(pkg.name + '-' + pkg.version + '.js'))
+        .pipe(concat(pkg.name + '.js'))
         .pipe(gulp.dest('./dist'))
-        .pipe(rename(pkg.name + '-' + pkg.version + '.min.js'))
+//        .pipe(rename(pkg.name + '-' + pkg.version + '.js'))
+//        .pipe(gulp.dest('./dist'))
+//        .pipe(rename(pkg.name + '-' + pkg.version + '.min.js'))
+        .pipe(rename(pkg.name + '.min.js'))
         .pipe(uglify())
         .pipe(size({showFiles:true}))
         .pipe(gulp.dest('./dist'));
@@ -135,14 +139,21 @@ gulp.task('git-tag-commit', function(cb) {
     executeCommand(commandLine, cb);
 });
 
-gulp.task('example-upgrade-tag', function(){
+gulp.task('bower-upgrade-tag', function(){
     var pkg = require('./package.json');
     var v = pkg.version;
-    var file = 'example/*.html';
 
-    return gulp.src([file])
-        .pipe(replace(/geospockweb-([\d.]+)\.js/g, 'geospockweb-' + v + '.js'))
-        .pipe(gulp.dest('example'));
+
+    return gulp.src("bower.json")
+      .pipe(jeditor({
+        'version': v
+      }))
+      .pipe(gulp.dest("."));
+
+
+    // return gulp.src(['bower.json'])
+    //     .pipe(replace(/geospockweb-([\d.]+)\.js/g, 'geospockweb-' + v + '.js'))
+    //     .pipe(gulp.dest('.'));
 });
 
 // continous integration tasks
@@ -188,5 +199,5 @@ function puts(error, stdout, stderr) {
 
 // will execute the needed stuff to bump successfully
 function bumpHelper(bumpType, cb) {
-    runSequence('npm-bump-'+bumpType, 'build', 'example-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
+    runSequence('npm-bump-'+bumpType, 'build', 'bower-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
 }

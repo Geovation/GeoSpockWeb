@@ -6,7 +6,7 @@
     "Sebastian Ovide <Sebastian.Ovide@geovation.uk>"
   ],
   "description": "JS SDK for using GeoSpock API on the Web",
-  "main": "geospockweb.js",
+  "main": "dist/geospockweb.js",
   "moduleType": [
     "globals"
   ],

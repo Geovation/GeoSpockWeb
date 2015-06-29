@@ -46,7 +46,7 @@ gulp.task('default', tasklist.withFilters(function(task) {
  */
 
 gulp.task('bower', function() {
- return bower();
+  return bower();
 });
 
 gulp.task('build', ['clean', 'bower', 'test'], function (cb) {
@@ -82,7 +82,7 @@ gulp.task('bump-major', function(cb) {
     bumpHelper('major', cb);
 });
 
-gulp.task('test', ['bower', 'lint', 'karma-tests']);
+gulp.task('test', ['lint', 'karma-tests']);
 
 /*
  * gulp helper tasks
@@ -164,11 +164,11 @@ gulp.task('lint', function (cb) {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('karma-tests', function(cb){
+gulp.task('karma-tests', ['bower'], function(cb){
     console.log();
     console.log('Run all the tests now');
 
-    karma.start(
+    return karma.start(
       {
         configFile: __dirname + '/test/karma.conf.js',
         singleRun: true

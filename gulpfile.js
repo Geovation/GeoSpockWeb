@@ -16,7 +16,7 @@ var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var size = require('gulp-size');
-var clean = require('gulp-clean');
+var del = require('del');
 var bump = require('gulp-bump');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
@@ -61,8 +61,9 @@ gulp.task('build', ['clean', 'bower'], function (cb) {
 });
 
 gulp.task('clean', function (cb) {
-  return gulp.src('./dist', { read: false })
-    .pipe(clean());
+  del([
+    './dist'
+  ], cb);
 });
 
 gulp.task('bump-patch', function(cb) {

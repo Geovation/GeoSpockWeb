@@ -49,13 +49,14 @@ window.console.log = this.console.log || function() {};
     // Set the server for GeoSpockWeb to talk to.
     // GeoSpockWeb.serverURL = "https://en.wikipedia.org";
 
-    // /**
-    //  * Call this method first to set your authentication key.
-    //  * @param {String} API Token
-    //  */
-    // GeoSpockWeb.Initialize = function(apiToken) {
-    //   GeoSpockWeb.apiToken = apiToken;
-    // };
+    /**
+     * Call this method first to set your authentication key.
+     * @param {String} API Token
+     */
+    GeoSpockWeb.Initialize = function(serverUrl, apiToken) {
+      GeoSpockWeb.serverUrl = serverUrl;
+      GeoSpockWeb.apiToken = apiToken;
+    };
 
     // /**
     //  * Get data according to a wikipedia page.

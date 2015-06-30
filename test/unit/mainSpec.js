@@ -12,10 +12,6 @@
             expect(GeoSpockWeb).toBeDefined();
         });
 
-        // it("should have a method called Initialize", function () {
-        //     expect( GeoSpockWeb.Initialize ).toBeDefined();
-        // });
-
         // it("should call the requestSample method when getting a page", function () {
         //     spyOn(GeoSpockWeb, '_requestSample');
         //     GeoSpockWeb.GetPage('Cheese');
@@ -23,11 +19,21 @@
         // });
     });
 
-    // describe("GeoSpockWeb.WikiTextHelper", function () {
-    //     it("should convert a given text to upper case", function () {
-    //         var upperCase = GeoSpockWeb.WikiTextHelper._upperCase('some text I got');
-    //         expect(upperCase).toBe('SOME TEXT I GOT');
-    //     });
-    // });
+    describe("GeoSpockWeb.Initialize", function () {
+      it("should have a method called Initialize", function () {
+        expect(GeoSpockWeb.Initialize).toBeDefined();
+      });
+
+      it("should initialize the serverUrl and the apiToken", function () {
+        var serverUrl="http://www.example.com";
+        var apiToken="anInterestingToken";
+        GeoSpockWeb.Initialize(serverUrl,apiToken);
+        expect(GeoSpockWeb.serverUrl).toBe(serverUrl);
+        expect(GeoSpockWeb.apiToken).toBe(apiToken);
+      });
+
+      
+    });
+
 
 })();

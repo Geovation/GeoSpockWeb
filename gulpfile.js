@@ -8,20 +8,19 @@
  */
 
 var gulp = require('gulp');
-var bower = require('gulp-bower');
-var args   = require('yargs').argv;
-var gutil = require('gulp-util');
+//var args   = require('yargs').argv;
+//var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
-var replace = require('gulp-replace');
+//var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var size = require('gulp-size');
 var del = require('del');
 var bump = require('gulp-bump');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
-var colours = require('colors');
-var fs = require('fs');
+//var colours = require('colors');
+//var fs = require('fs');
 var exec = require('child_process').exec;
 var sys = require('sys');
 var tasklist = require('gulp-task-listing');
@@ -45,19 +44,12 @@ gulp.task('default', tasklist.withFilters(function(task) {
  * ***********************************************************************************************
  */
 
-gulp.task('bower', function() {
-  return bower();
-});
-
-gulp.task('build', ['clean', 'bower', 'test'], function (cb) {
+gulp.task('build', ['clean', 'test'], function (cb) {
     var pkg = require('./package.json');
 
     return gulp.src('./src/*.js')
         .pipe(concat(pkg.name + '.js'))
         .pipe(gulp.dest('./dist'))
-//        .pipe(rename(pkg.name + '-' + pkg.version + '.js'))
-//        .pipe(gulp.dest('./dist'))
-//        .pipe(rename(pkg.name + '-' + pkg.version + '.min.js'))
         .pipe(rename(pkg.name + '.min.js'))
         .pipe(uglify())
         .pipe(size({showFiles:true}))
@@ -149,11 +141,6 @@ gulp.task('bower-upgrade-tag', function(){
         'version': v
       }))
       .pipe(gulp.dest("."));
-
-
-    // return gulp.src(['bower.json'])
-    //     .pipe(replace(/geospockweb-([\d.]+)\.js/g, 'geospockweb-' + v + '.js'))
-    //     .pipe(gulp.dest('.'));
 });
 
 // continous integration tasks
@@ -164,7 +151,7 @@ gulp.task('lint', function (cb) {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('karma-tests', ['bower'], function(cb){
+gulp.task('karma-tests', function(cb){
     console.log();
     console.log('Run all the tests now');
 

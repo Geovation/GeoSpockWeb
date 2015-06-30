@@ -32,6 +32,8 @@ window.console.log = this.console.log || function() {};
 
     root.GeoSpockWeb = root.GeoSpockWeb || {};
 
+    var BASE_PATH = "/_ah/api/locatables/v2/";
+
     /**
     * Contains all GeoSpockWeb API classes and functions.
     * @name GeoSpockWeb
@@ -53,53 +55,18 @@ window.console.log = this.console.log || function() {};
      * Call this method first to set your authentication key.
      * @param {String} API Token
      */
-    GeoSpockWeb.Initialize = function(serverUrl, apiToken) {
+    GeoSpockWeb.Initialize = function(serverUrl, collideKey) {
       GeoSpockWeb.serverUrl = serverUrl;
-      GeoSpockWeb.apiToken = apiToken;
+      GeoSpockWeb.CollideKey = collideKey;
+
+      // Set ajax defaults
+      root.$.ajaxSetup({
+        url: serverUrl + BASE_PATH,
+        headers: {
+          'Content-Type': 'application/json',
+          'CollideKey': collideKey
+        }
+      });
     };
-
-    // /**
-    //  * Get data according to a wikipedia page.
-    //  * @param {string} title of a wikipedia page like 'Cheese'
-    //  */
-    // GeoSpockWeb.GetPage = function(title) {
-    //   GeoSpockWeb._requestSample(title, function(data) {
-    //     var rawtext = data.query.pages[Object.keys(data.query.pages)[0]].revisions[0]["*"];
-    //     var upperCaseTest = GeoSpockWeb.WikiTextHelper._upperCase(rawtext);
-    //
-    //     GeoSpockWeb.$( "body" ).append( '<p>'+title+':</p>' );
-    //     GeoSpockWeb.$( "body" ).append( '<p>'+rawtext.substring(0, 250)+'</p>' );
-    //     GeoSpockWeb.$( "body" ).append( '<p>'+upperCaseTest.substring(0, 250)+'</p>' );
-    //   });
-    // };
-
-    // /**
-    //  * sample request to our api server
-    //  * @param  {string} title
-    //  * @param  {function} successCallback
-    //  */
-    // GeoSpockWeb._requestSample = function(title, successCallback) {
-    //
-    //     var url = GeoSpockWeb.serverURL+
-    //               "/w/api.php?rvprop=content&format=json&prop=revisions|categories&rvprop=content&action=query&titles="+
-    //               encodeURI(title)+
-    //               "&token="+
-    //               encodeURI(GeoSpockWeb.apiToken);
-    //
-    //     var jqxhr =
-    //       GeoSpockWeb.$.ajax({
-    //           url: url,
-    //           dataType: 'jsonp',
-    //           type: 'GET'
-    //       })
-    //       .success (function(result) {
-    //           successCallback(result);
-    //       })
-    //       .error   (function()     {
-    //           console.log('Http request failed');
-    //           // throw eror here
-    //       })
-    //       ;
-    // };
 
 }(this));

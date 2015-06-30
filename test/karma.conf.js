@@ -35,9 +35,23 @@ module.exports = function(config){
             suite: ''
         },
 
+        htmlReporter: {
+          outputDir: 'build/reports/', // where to put the reports
+          templatePath: null, // set if you moved jasmine_template.html
+          focusOnFailures: true, // reports show failures on start
+          namedFiles: false, // name files instead of creating sub-directories
+          pageTitle: null, // page title for reports; browser info by default
+          urlFriendlyName: false, // simply replaces spaces with _ for files/dirs
+
+
+          // experimental
+          preserveDescribeNesting: false, // folded suites stay folded
+          foldAll: false, // reports start folded (only with preserveDescribeNesting)
+        },
+
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit'
-        reporters : ['dots', 'progress', 'coverage', 'junit'],
+        reporters : ['mocha','coverage', 'junit', 'html'],
 
         // web server port
         port : 9876,
@@ -50,7 +64,7 @@ module.exports = function(config){
 
         // level of logging
         // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-        logLevel : config.LOG_ERROR,
+        logLevel : config.LOG_INFO,
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch : false,

@@ -21,8 +21,8 @@ window.console.log = this.console.log || function() {};
  * expose our sdk
  */
 (function(root) {
-  root.GeoVationWeb = root.GeoVationWeb || {};
-  root.GeoVationWeb.VERSION="0.0.2"; // It will be replaced by the build script
+  root.GeoSpockWeb = root.GeoSpockWeb || {};
+  root.GeoSpockWeb.VERSION="0.0.2"; // It will be replaced by the build script
 }(this));
 
 /**
@@ -30,45 +30,45 @@ window.console.log = this.console.log || function() {};
  */
 (function(root) {
 
-    root.GeoVationWeb = root.GeoVationWeb || {};
+    root.GeoSpockWeb = root.GeoSpockWeb || {};
 
     /**
-    * Contains all GeoVationWeb API classes and functions.
-    * @name GeoVationWeb
+    * Contains all GeoSpockWeb API classes and functions.
+    * @name GeoSpockWeb
     * @namespace
     *
-    * Contains all GeoVationWeb API classes and functions.
+    * Contains all GeoSpockWeb API classes and functions.
     */
-    var GeoVationWeb = root.GeoVationWeb;
+    var GeoSpockWeb = root.GeoSpockWeb;
 
     // If jQuery has been included, grab a reference to it.
     if (typeof(root.$) !== "undefined") {
-        GeoVationWeb.$ = root.$;
+        GeoSpockWeb.$ = root.$;
     }
 
-    // Set the server for GeoVationWeb to talk to.
-    // GeoVationWeb.serverURL = "https://en.wikipedia.org";
+    // Set the server for GeoSpockWeb to talk to.
+    // GeoSpockWeb.serverURL = "https://en.wikipedia.org";
 
     // /**
     //  * Call this method first to set your authentication key.
     //  * @param {String} API Token
     //  */
-    // GeoVationWeb.Initialize = function(apiToken) {
-    //   GeoVationWeb.apiToken = apiToken;
+    // GeoSpockWeb.Initialize = function(apiToken) {
+    //   GeoSpockWeb.apiToken = apiToken;
     // };
 
     // /**
     //  * Get data according to a wikipedia page.
     //  * @param {string} title of a wikipedia page like 'Cheese'
     //  */
-    // GeoVationWeb.GetPage = function(title) {
-    //   GeoVationWeb._requestSample(title, function(data) {
+    // GeoSpockWeb.GetPage = function(title) {
+    //   GeoSpockWeb._requestSample(title, function(data) {
     //     var rawtext = data.query.pages[Object.keys(data.query.pages)[0]].revisions[0]["*"];
-    //     var upperCaseTest = GeoVationWeb.WikiTextHelper._upperCase(rawtext);
+    //     var upperCaseTest = GeoSpockWeb.WikiTextHelper._upperCase(rawtext);
     //
-    //     GeoVationWeb.$( "body" ).append( '<p>'+title+':</p>' );
-    //     GeoVationWeb.$( "body" ).append( '<p>'+rawtext.substring(0, 250)+'</p>' );
-    //     GeoVationWeb.$( "body" ).append( '<p>'+upperCaseTest.substring(0, 250)+'</p>' );
+    //     GeoSpockWeb.$( "body" ).append( '<p>'+title+':</p>' );
+    //     GeoSpockWeb.$( "body" ).append( '<p>'+rawtext.substring(0, 250)+'</p>' );
+    //     GeoSpockWeb.$( "body" ).append( '<p>'+upperCaseTest.substring(0, 250)+'</p>' );
     //   });
     // };
 
@@ -77,16 +77,16 @@ window.console.log = this.console.log || function() {};
     //  * @param  {string} title
     //  * @param  {function} successCallback
     //  */
-    // GeoVationWeb._requestSample = function(title, successCallback) {
+    // GeoSpockWeb._requestSample = function(title, successCallback) {
     //
-    //     var url = GeoVationWeb.serverURL+
+    //     var url = GeoSpockWeb.serverURL+
     //               "/w/api.php?rvprop=content&format=json&prop=revisions|categories&rvprop=content&action=query&titles="+
     //               encodeURI(title)+
     //               "&token="+
-    //               encodeURI(GeoVationWeb.apiToken);
+    //               encodeURI(GeoSpockWeb.apiToken);
     //
     //     var jqxhr =
-    //       GeoVationWeb.$.ajax({
+    //       GeoSpockWeb.$.ajax({
     //           url: url,
     //           dataType: 'jsonp',
     //           type: 'GET'

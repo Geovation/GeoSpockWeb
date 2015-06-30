@@ -3,15 +3,14 @@
 
     describe("GeoSpockWeb", function () {
 
-        it("sanity check", function () {
+        it("should find jQuery", function () {
           expect(true).toBe(true);
           expect($).toBe(jQuery);
         });
 
-        // it("should expose the sdk", function () {
-        //     expect( GeoSpockWeb ).toBeDefined();
-        //     expect( GeoSpockWeb.WikiTextHelper ).toBeDefined();
-        // });
+        it("should expose the sdk", function () {
+            expect(GeoSpockWeb).toBeDefined();
+        });
 
         // it("should have a method called Initialize", function () {
         //     expect( GeoSpockWeb.Initialize ).toBeDefined();

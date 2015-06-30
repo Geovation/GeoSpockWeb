@@ -1,5 +1,5 @@
 /**
- * this is the main task runner for managing the GeoVationWeb
+ * this is the main task runner for managing the GeoSpockWeb
  */
 
 /*
@@ -149,7 +149,7 @@ gulp.task('upgrade-version-js', function() {
   var v = pkg.version;
 
   return gulp.src('./dist/*')
-    .pipe(replace(/.GeoVationWeb.VERSION="REPLACE_ME_PLEASE"/g, '.GeoVationWeb.VERSION="' + v + '"'))
+    .pipe(replace(/.GeoSpockWeb.VERSION="REPLACE_ME_PLEASE"/g, '.GeoSpockWeb.VERSION="' + v + '"'))
     .pipe(gulp.dest('./dist/'));
 });
 

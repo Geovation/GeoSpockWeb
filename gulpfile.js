@@ -8,6 +8,7 @@
  */
 
 var gulp = require('gulp');
+var bower = require('gulp-bower');
 var args   = require('yargs').argv;
 var gutil = require('gulp-util');
 var concat = require('gulp-concat');
@@ -15,7 +16,7 @@ var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var size = require('gulp-size');
-var clean = require('gulp-clean');
+var del = require('del');
 var bump = require('gulp-bump');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
@@ -25,6 +26,8 @@ var exec = require('child_process').exec;
 var sys = require('sys');
 var tasklist = require('gulp-task-listing');
 var runSequence = require('run-sequence');
+var karma = require('karma').server;
+var jeditor = require("gulp-json-editor");
 
 var PROJECT_BASE_PATH = __dirname + '';
 
@@ -42,21 +45,29 @@ gulp.task('default', tasklist.withFilters(function(task) {
  * ***********************************************************************************************
  */
 
-gulp.task('build', ['clean'], function (cb) {
+gulp.task('bower', function() {
+  return bower();
+});
+
+gulp.task('build', ['clean', 'bower', 'test'], function (cb) {
     var pkg = require('./package.json');
 
     return gulp.src('./src/*.js')
-        .pipe(concat(pkg.name + '-' + pkg.version + '.js'))
+        .pipe(concat(pkg.name + '.js'))
         .pipe(gulp.dest('./dist'))
-        .pipe(rename(pkg.name + '-' + pkg.version + '.min.js'))
+//        .pipe(rename(pkg.name + '-' + pkg.version + '.js'))
+//        .pipe(gulp.dest('./dist'))
+//        .pipe(rename(pkg.name + '-' + pkg.version + '.min.js'))
+        .pipe(rename(pkg.name + '.min.js'))
         .pipe(uglify())
         .pipe(size({showFiles:true}))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('clean', function (cb) {
-  return gulp.src('./dist', { read: false })
-    .pipe(clean());
+  del([
+    './dist'
+  ], cb);
 });
 
 gulp.task('bump-patch', function(cb) {
@@ -128,14 +139,21 @@ gulp.task('git-tag-commit', function(cb) {
     executeCommand(commandLine, cb);
 });
 
-gulp.task('example-upgrade-tag', function(){
+gulp.task('bower-upgrade-tag', function(){
     var pkg = require('./package.json');
     var v = pkg.version;
-    var file = 'example/*.html';
 
-    return gulp.src([file])
-        .pipe(replace(/geospockweb-([\d.]+)\.js/g, 'geospockweb-' + v + '.js'))
-        .pipe(gulp.dest('example'));
+
+    return gulp.src("bower.json")
+      .pipe(jeditor({
+        'version': v
+      }))
+      .pipe(gulp.dest("."));
+
+
+    // return gulp.src(['bower.json'])
+    //     .pipe(replace(/geospockweb-([\d.]+)\.js/g, 'geospockweb-' + v + '.js'))
+    //     .pipe(gulp.dest('.'));
 });
 
 // continous integration tasks
@@ -146,13 +164,19 @@ gulp.task('lint', function (cb) {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('karma-tests', function(cb){
+gulp.task('karma-tests', ['bower'], function(cb){
     console.log();
     console.log('Run all the tests now');
-    var karmaConfigFile = PROJECT_BASE_PATH+'/test/karma.conf.js';
-    var commandLine = 'karma start '+karmaConfigFile;
-    executeCommand(commandLine, cb);
-    console.log();
+
+    return karma.start(
+      {
+        configFile: __dirname + '/test/karma.conf.js',
+        singleRun: true
+      }, function() {
+        console.log("End Karma" );
+      }
+    );
+
 });
 
 /*
@@ -175,5 +199,5 @@ function puts(error, stdout, stderr) {
 
 // will execute the needed stuff to bump successfully
 function bumpHelper(bumpType, cb) {
-    runSequence('npm-bump-'+bumpType, 'build', 'example-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
+    runSequence('npm-bump-'+bumpType, 'build', 'bower-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
 }

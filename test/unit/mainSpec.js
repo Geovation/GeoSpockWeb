@@ -1,32 +1,34 @@
 (function () {
     "use strict";
 
-    describe("WikiSampleSDK", function () {
+    describe("GeoSpockWeb", function () {
+
         it("sanity check", function () {
-            expect(true).toBe(true);
+          expect(true).toBe(true);
+          expect($).toBe(jQuery);
         });
 
-        it("should expose the sdk", function () {
-            expect( WikiSampleSDK ).toBeDefined();
-            expect( WikiSampleSDK.WikiTextHelper ).toBeDefined();
-        });
+        // it("should expose the sdk", function () {
+        //     expect( GeoSpockWeb ).toBeDefined();
+        //     expect( GeoSpockWeb.WikiTextHelper ).toBeDefined();
+        // });
 
-        it("should have a method called GetPage", function () {
-            expect( WikiSampleSDK.GetPage ).toBeDefined();
-        });
+        // it("should have a method called Initialize", function () {
+        //     expect( GeoSpockWeb.Initialize ).toBeDefined();
+        // });
 
-        it("should call the requestSample method when getting a page", function () {
-            spyOn(WikiSampleSDK, '_requestSample');
-            WikiSampleSDK.GetPage('Cheese');
-            expect(WikiSampleSDK._requestSample.calls.length).toEqual(1);
-        });
+        // it("should call the requestSample method when getting a page", function () {
+        //     spyOn(GeoSpockWeb, '_requestSample');
+        //     GeoSpockWeb.GetPage('Cheese');
+        //     expect(GeoSpockWeb._requestSample.calls.length).toEqual(1);
+        // });
     });
 
-    describe("WikiSampleSDK.WikiTextHelper", function () {
-        it("should convert a given text to upper case", function () {
-            var upperCase = WikiSampleSDK.WikiTextHelper._upperCase('some text I got');
-            expect(upperCase).toBe('SOME TEXT I GOT');
-        });
-    });
+    // describe("GeoSpockWeb.WikiTextHelper", function () {
+    //     it("should convert a given text to upper case", function () {
+    //         var upperCase = GeoSpockWeb.WikiTextHelper._upperCase('some text I got');
+    //         expect(upperCase).toBe('SOME TEXT I GOT');
+    //     });
+    // });
 
 })();

@@ -22,7 +22,7 @@ window.console.log = this.console.log || function() {};
  */
 (function(root) {
   root.GeoVationWeb = root.GeoVationWeb || {};
-  root.GeoVationWeb.VERSION="REPLACE_ME_PLEASE"; // It will be replaced by the build script
+  root.GeoVationWeb.VERSION="0.0.2"; // It will be replaced by the build script
 }(this));
 
 /**

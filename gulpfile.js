@@ -10,6 +10,7 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var size = require('gulp-size');
 var del = require('del');
@@ -39,7 +40,11 @@ gulp.task('default', tasklist.withFilters(function(task) {
  * ***********************************************************************************************
  */
 
-gulp.task('build', ['clean', 'test'], function (cb) {
+gulp.task('build', ['pre-build'], function(cb) {
+  runSequence('upgrade-version-js', cb);
+});
+
+gulp.task('pre-build', ['clean', 'test'], function (cb) {
     var pkg = require('./package.json');
 
     return gulp.src('./src/*.js')
@@ -52,7 +57,7 @@ gulp.task('build', ['clean', 'test'], function (cb) {
 });
 
 gulp.task('clean', function (cb) {
-  del([
+  return del([
     './dist'
   ], cb);
 });
@@ -69,7 +74,9 @@ gulp.task('bump-major', function(cb) {
     bumpHelper('major', cb);
 });
 
-gulp.task('test', ['lint', 'karma-tests']);
+gulp.task('test', ['lint', 'karma-tests'], function(cb) {
+  return gulp.src('.');
+});
 
 /*
  * gulp helper tasks
@@ -141,9 +148,9 @@ gulp.task('upgrade-version-js', function() {
   var pkg = require('./package.json');
   var v = pkg.version;
 
-  return gulp.src('/src/main.js')
-    .pipe()
-    .pipe(gulp(dest('src/')));
+  return gulp.src('./dist/*')
+    .pipe(replace(/.GeoVationWeb.VERSION="REPLACE_ME_PLEASE"/g, '.GeoVationWeb.VERSION="' + v + '"'))
+    .pipe(gulp.dest('./dist/'));
 });
 
 
@@ -156,17 +163,11 @@ gulp.task('lint', function (cb) {
 });
 
 gulp.task('karma-tests', function(cb){
-    console.log();
     console.log('Run all the tests now');
 
-    return karma.start(
-      {
-        configFile: __dirname + '/test/karma.conf.js',
-        singleRun: true
-      }, function() {
-        console.log("End Karma" );
-      }
-    );
+    karma.start({
+        configFile: __dirname + '/test/karma.conf.js'
+    }, cb );
 
 });
 
@@ -190,5 +191,5 @@ function puts(error, stdout, stderr) {
 
 // will execute the needed stuff to bump successfully
 function bumpHelper(bumpType, cb) {
-    runSequence('npm-bump-'+bumpType, 'upgrade-version-js', 'build', 'bower-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
+    runSequence('npm-bump-'+bumpType, 'build', 'bower-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
 }

@@ -11,10 +11,7 @@ module.exports = function(config){
             'test/unit/**/*.js',
 
             // now all the dependencies have been sorted, the app code can be loaded
-            'src/*/*/*/*.js',
-            'src/*/*/*.js',
-            'src/*/*.js',
-            'src/**/*.js',
+            'src/*.js',
             'bower_components/jquery/dist/jquery.min.js'
         ],
 

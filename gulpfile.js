@@ -8,19 +8,14 @@
  */
 
 var gulp = require('gulp');
-//var args   = require('yargs').argv;
-//var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
-//var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var size = require('gulp-size');
 var del = require('del');
 var bump = require('gulp-bump');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
-//var colours = require('colors');
-//var fs = require('fs');
 var exec = require('child_process').exec;
 var sys = require('sys');
 var tasklist = require('gulp-task-listing');
@@ -135,13 +130,22 @@ gulp.task('bower-upgrade-tag', function(){
     var pkg = require('./package.json');
     var v = pkg.version;
 
-
     return gulp.src("bower.json")
       .pipe(jeditor({
         'version': v
       }))
       .pipe(gulp.dest("."));
 });
+
+gulp.task('upgrade-version-js', function() {
+  var pkg = require('./package.json');
+  var v = pkg.version;
+
+  return gulp.src('/src/main.js')
+    .pipe()
+    .pipe(gulp(dest('src/')));
+});
+
 
 // continous integration tasks
 
@@ -186,5 +190,5 @@ function puts(error, stdout, stderr) {
 
 // will execute the needed stuff to bump successfully
 function bumpHelper(bumpType, cb) {
-    runSequence('npm-bump-'+bumpType, 'build', 'bower-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
+    runSequence('npm-bump-'+bumpType, 'upgrade-version-js', 'build', 'bower-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
 }

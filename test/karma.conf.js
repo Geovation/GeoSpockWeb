@@ -12,7 +12,7 @@ module.exports = function(config){
 
             // now all the dependencies have been sorted, the app code can be loaded
             'src/*.js',
-            'bower_components/jquery/dist/jquery.min.js'
+            'node_modules/jquery/dist/jquery.min.js'
         ],
 
         // list of files to exclude

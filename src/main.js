@@ -29,10 +29,8 @@ window.console.log = this.console.log || function() {};
  * main sdk
  */
 (function(root) {
-
     root.GeoSpockWeb = root.GeoSpockWeb || {};
-
-    var BASE_PATH = "/_ah/api/locatables/v2/";
+    var BASE_PATH = "/_ah/api/locatables/v2";
 
     /**
     * Contains all GeoSpockWeb API classes and functions.
@@ -55,7 +53,7 @@ window.console.log = this.console.log || function() {};
      * Call this method first to set your authentication key.
      * @param {String} API Token
      */
-    GeoSpockWeb.Initialize = function(serverUrl, collideKey) {
+    GeoSpockWeb.init = function(serverUrl, collideKey) {
       GeoSpockWeb.serverUrl = serverUrl;
       GeoSpockWeb.CollideKey = collideKey;
 
@@ -66,6 +64,19 @@ window.console.log = this.console.log || function() {};
           'Content-Type': 'application/json',
           'CollideKey': collideKey
         }
+      });
+    };
+
+    /**
+     * http://docs.geospock.apiary.io/#reference/locatables/uploading-data/create-new-locatables
+    */
+    GeoSpockWeb.post = function(data, type) {
+      var type = type || 0;
+
+      return root.$.ajax({
+        url: root.$.ajaxSettings.url + "/" + type,
+        method: 'POST',
+        data: data
       });
     };
 

@@ -70,20 +70,34 @@ window.console.log = this.console.log || function() {};
 
     /**
      * http://docs.geospock.apiary.io/#reference/locatables/uploading-data/create-new-locatables
-    */
+     */
     GeoSpockWeb.post = function(data, type) {
       var type = type || 0;
 
-      if (type > INT_MAX) {
-        var deferred = root.$.Deferred();
-        deferred.reject();
-        return deferred;
+      if (!data || type > INT_MAX) {
+        return root.$.Deferred().reject();
       }
 
       return root.$.ajax({
         url: root.$.ajaxSettings.url + "/" + type,
         method: 'POST',
         data: JSON.stringify(data)
+      });
+    };
+
+    /**
+     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/get-a-single-locatable
+     */
+    GeoSpockWeb.get = function(id, type) {
+      var type = type || 0;
+
+      if (!id || type > INT_MAX) {
+        return root.$.Deferred().reject();
+      }
+
+      return root.$.ajax({
+        url: root.$.ajaxSettings.url + "/" + type + "/" + id,
+        method: 'GET'
       });
     };
 

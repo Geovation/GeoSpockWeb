@@ -83,7 +83,7 @@ window.console.log = this.console.log || function() {};
       return root.$.ajax({
         url: root.$.ajaxSettings.url + "/" + type,
         method: 'POST',
-        data: data
+        data: JSON.stringify(data)
       });
     };
 

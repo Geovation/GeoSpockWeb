@@ -41,7 +41,7 @@ gulp.task('default', tasklist.withFilters(function(task) {
  */
 
 gulp.task('build', ['pre-build'], function(cb) {
-  runSequence('upgrade-version-js', cb);
+  runSequence('update-version', cb);
 });
 
 gulp.task('pre-build', ['clean', 'test'], function (cb) {
@@ -133,7 +133,7 @@ gulp.task('git-tag-commit', function(cb) {
     executeCommand(commandLine, cb);
 });
 
-gulp.task('bower-upgrade-tag', function(){
+gulp.task('update-version-bower', function(){
     var pkg = require('./package.json');
     var v = pkg.version;
 
@@ -144,7 +144,9 @@ gulp.task('bower-upgrade-tag', function(){
       .pipe(gulp.dest("."));
 });
 
-gulp.task('upgrade-version-js', function() {
+gulp.task('update-version', ['update-version-js', 'update-version-bower']);
+
+gulp.task('update-version-js', function() {
   var pkg = require('./package.json');
   var v = pkg.version;
 
@@ -191,5 +193,5 @@ function puts(error, stdout, stderr) {
 
 // will execute the needed stuff to bump successfully
 function bumpHelper(bumpType, cb) {
-    runSequence('npm-bump-'+bumpType, 'build', 'bower-upgrade-tag', 'git-tag-commit', 'git-tag', cb);
+    runSequence('npm-bump-'+bumpType, 'build', 'git-tag-commit', 'git-tag', cb);
 }

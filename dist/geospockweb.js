@@ -22,7 +22,7 @@ window.console.log = this.console.log || function() {};
  */
 (function(root) {
   root.GeoSpockWeb = root.GeoSpockWeb || {};
-  root.GeoSpockWeb.VERSION="0.0.1"; // It will be replaced by the build script
+  root.GeoSpockWeb.VERSION="0.0.2"; // It will be replaced by the build script
 }(this));
 
 /**

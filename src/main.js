@@ -31,6 +31,7 @@ window.console.log = this.console.log || function() {};
 (function(root) {
     root.GeoSpockWeb = root.GeoSpockWeb || {};
     var BASE_PATH = "/_ah/api/locatables/v2";
+    var INT_MAX = 2147483647;
 
     /**
     * Contains all GeoSpockWeb API classes and functions.
@@ -73,10 +74,16 @@ window.console.log = this.console.log || function() {};
     GeoSpockWeb.post = function(data, type) {
       var type = type || 0;
 
+      if (type > INT_MAX) {
+        var deferred = root.$.Deferred();
+        deferred.reject();
+        return deferred;
+      }
+
       return root.$.ajax({
         url: root.$.ajaxSettings.url + "/" + type,
         method: 'POST',
-        data: data
+        data: JSON.stringify(data)
       });
     };
 

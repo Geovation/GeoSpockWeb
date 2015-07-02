@@ -5,7 +5,6 @@ module.exports = function(config){
 
         // list of files / patterns to load in the browser
         files : [
-
             // the reason we load unit tests next is because they don't depend on the app. On the contrary,
             // they set mocks ahead of time for the units so they have to be loaded first
             'test/unit/**/*.js',
@@ -13,6 +12,7 @@ module.exports = function(config){
             // now all the dependencies have been sorted, the app code can be loaded
             'src/*.js',
             'node_modules/jquery/dist/jquery.min.js'
+
         ],
 
         // list of files to exclude
@@ -22,7 +22,7 @@ module.exports = function(config){
             'karma.conf.js'
         ],
 
-        frameworks : ['jasmine'],
+        frameworks : ['jasmine-ajax', 'jasmine'],
 
         coverageReporter : {
             type: 'text-summary',

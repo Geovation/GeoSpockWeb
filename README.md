@@ -5,11 +5,11 @@ A Web SDK for using GeoSpock APIs. Check out the [demo](https://raw.githubuserco
 
 ### 1. Installation
 
-* ```bower install -s geospockweb```
+* ```bower install GeoSpockWeb```
 
 ### 2. GitHuh contributions
 * fork https://github.com/Geovation/GeoSpockWeb
-* work on it, commit and push into your fork
+* work on it, commit and push into your repo
 * from GitHub ask for a pull request
 
 ### 3. Development
@@ -18,10 +18,5 @@ A Web SDK for using GeoSpock APIs. Check out the [demo](https://raw.githubuserco
 * ```npm install```
 * ```gulp``` to see the list of available tasks
 
-### 4. Essential Gulp Tasks
-* ```gulp build``` dumps a plain and a minified file from all files in the folder ```src``` into the folder ```dist```.
-* ```gulp clean``` removes all files in the folder ```dist```.
+### 4. Essential Gulp Task
 * ```gulp test``` runs the tests and linting for all files in the folder ```src```.
-* ```gulp bump-patch``` increases the version by ```0.0.1``` for the last git commit and pushes the new tag to the remote repository.
-* ```gulp bump-minor``` increases the version by ```0.1.0``` for the last git commit and pushes the new tag to the remote repository.
-* ```gulp bump-major``` increases the version by ```1.0.0``` for the last git commit and pushes the new tag to the remote repository.

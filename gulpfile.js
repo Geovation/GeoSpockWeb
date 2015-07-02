@@ -188,7 +188,7 @@ function executeCommand(commandLine, cb) {
 
 // well display console expressions
 function puts(error, stdout, stderr) {
-    sys.puts(stdout);
+    console.log(stdout);
 }
 
 // will execute the needed stuff to bump successfully

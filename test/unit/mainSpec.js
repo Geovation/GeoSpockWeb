@@ -57,7 +57,16 @@
       GeoSpockWeb.post({somedata:'somedata'});
     });
 
-//    it('should fail if the type is > 2,147,483,647 (INT_MAX)', function() {});
+    it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
+      GeoSpockWeb.init(serverUrl,collideKey);
+      var TYPE = 3000000000;
+
+      GeoSpockWeb.post({somedata:'somedata'}, TYPE)
+        .fail(function() {
+          done();
+          expect(true).toBe(true);
+        });
+    });
 
 //    it('should post the given object with the given type', function() {});
   });

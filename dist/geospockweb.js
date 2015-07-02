@@ -31,6 +31,7 @@ window.console.log = this.console.log || function() {};
 (function(root) {
     root.GeoSpockWeb = root.GeoSpockWeb || {};
     var BASE_PATH = "/_ah/api/locatables/v2";
+    var INT_MAX = 2147483647;
 
     /**
     * Contains all GeoSpockWeb API classes and functions.
@@ -69,14 +70,48 @@ window.console.log = this.console.log || function() {};
 
     /**
      * http://docs.geospock.apiary.io/#reference/locatables/uploading-data/create-new-locatables
-    */
+     */
     GeoSpockWeb.post = function(data, type) {
       var type = type || 0;
+
+      if (!data || type > INT_MAX) {
+        return root.$.Deferred().reject();
+      }
 
       return root.$.ajax({
         url: root.$.ajaxSettings.url + "/" + type,
         method: 'POST',
-        data: data
+        data: JSON.stringify(data)
+      });
+    };
+
+    /**
+     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/get-a-single-locatable
+     */
+    GeoSpockWeb.get = function(id, type) {
+      var type = type || 0;
+
+      if (!id || type > INT_MAX) {
+        return root.$.Deferred().reject();
+      }
+
+      return root.$.ajax({
+        url: root.$.ajaxSettings.url + "/" + type + "/" + id,
+        method: 'GET'
+      });
+    };
+
+    GeoSpockWeb.put = function(id, data, type) {
+      var type = type || 0;
+
+      if (!data || !id || type > INT_MAX) {
+        return root.$.Deferred().reject();
+      }
+
+      return root.$.ajax({
+        url: root.$.ajaxSettings.url + "/" + type + "/" + id,
+        method: 'PUT',
+        data: JSON.stringify(data)
       });
     };
 

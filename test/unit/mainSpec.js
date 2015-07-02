@@ -195,7 +195,42 @@
       });
     });
 
-    describe("GeoSpockWeb.delete", function() {});
+    describe("GeoSpockWeb.delete", function() {
+      it("should be defined", function () {
+        expect(GeoSpockWeb.delete).toBeDefined();
+      });
+
+      it('should default type to 0', function() {
+        var ID = 1234;
+        GeoSpockWeb.init(serverUrl,collideKey);
+        GeoSpockWeb.delete(ID);
+
+        var request = jasmine.Ajax.requests.mostRecent();
+        expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
+      });
+
+      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
+        GeoSpockWeb.init(serverUrl,collideKey);
+        var TYPE = 3000000000;
+        var ID = 1234;
+
+        GeoSpockWeb.delete(ID, TYPE)
+          .fail(function() {
+            done();
+            expect(true).toBe(true);
+          });
+      });
+
+      it('should fail if the ID is not defined', function(done) {
+        GeoSpockWeb.init(serverUrl,collideKey);
+
+        GeoSpockWeb.delete()
+          .fail(function() {
+            done();
+            expect(true).toBe(true);
+          });
+      });
+    });
   });
 
 

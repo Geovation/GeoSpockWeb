@@ -32,7 +32,7 @@ var PROJECT_BASE_PATH = __dirname + '';
  */
 
 gulp.task('default', tasklist.withFilters(function(task) {
-    return (["build","clean","test","bump-major","bump-minor","bump-patch"].indexOf(task) < 0);
+    return (["build","clean","test","bump-major","bump-minor","bump-patch","release"].indexOf(task) < 0);
 }));
 
 /*
@@ -121,7 +121,7 @@ gulp.task('git-tag-create', function(cb) {
 });
 
 gulp.task('git-tag-push', function(cb) {
-    var commandLine = 'git push origin master --tags';
+    var commandLine = 'git push upstream master --tags';
     executeCommand(commandLine, cb);
 });
 

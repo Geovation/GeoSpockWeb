@@ -11,17 +11,76 @@
         padding: 30px
       }
     </style>
-    <title>Usage example for the javascript-sdk-boilerplate</title>
+    <title>Usage example for the GeoSpockWeb</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script src="https://github.com/Geovation/GeoSpockWeb/blob/master/dist/geospockweb.js"></script>
-    <!-- load file locally if possibleand override the external from github -->
     <script src="../dist/geospockweb.js"></script>
     <script>
+        var serverUrl = "SERVER_URL";
+        var apiKey = "API_KEY";
+
         // initialize the sdk by giving your personal api token
-        GeoSpockWeb.init('someRandomApiKey');
+        GeoSpockWeb.init(serverUrl, apiKey);
 
         // use the sdk for your needs, this call should print data from wikipedia about cheese in the console
-        GeoSpockWeb.GetPage('Cheese');
+        var body = {
+          'locatables': [
+            {
+              'location': {
+                'lat': 51.523142,
+                'lon': -0.104949
+              },
+              'data': {
+                'id': '288a7a3d-2553-4ba3-8774-d644c09afd6d',
+                'm': 'Sending a message...',
+                't': '2015-01-29T09:41'
+              }
+            },
+            {
+              'location': {
+                'lat': 51.550797,
+                'lon': -0.170867
+              },
+              'data': {
+                'id': '73fed501-d008-4d6c-a941-d0678d5ee48e',
+                'm': 'In reply to your message:',
+                't': '2015-01-29T10:02'
+              }
+            },
+            {
+              'location': {
+                'lat': 51.615783,
+                'lon': -0.045512
+              },
+              'data': {
+                'id': '958eb997-9b8c-497a-a146-b0a51c4580ad',
+                'm': 'Following up on your reply:',
+                't': '2015-01-29T11:29'
+              }
+            }
+          ]
+        };
+
+        GeoSpockWeb
+          .post(body)
+          .then(function(response) {
+            console.log("Response from the server: " + response);
+            response.locatables.forEach(function(locatable){
+              console.log("Quering locatable id : " + locatable.id);
+
+              GeoSpockWeb
+                .get(locatable.id)
+                .then(function(res) {
+                  console.log(res);
+                })
+                .fail(function(){
+                  console.log("Something went wrong doing get");
+                });
+            });
+          })
+          .fail(function(){
+            console.log("Something went wrong doing post");
+          });
+
     </script>
   </head>
   <body>

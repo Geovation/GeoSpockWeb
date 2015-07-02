@@ -101,7 +101,9 @@ window.console.log = this.console.log || function() {};
       });
     };
 
-    /* http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/update-a-single-locatable */
+    /**
+     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/update-a-single-locatable
+     */
     GeoSpockWeb.put = function(id, data, type) {
       var type = type || 0;
 
@@ -113,6 +115,22 @@ window.console.log = this.console.log || function() {};
         url: root.$.ajaxSettings.url + "/" + type + "/" + id,
         method: 'PUT',
         data: JSON.stringify(data)
+      });
+    };
+
+    /**
+     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/delete-a-single-locatable
+     */
+    GeoSpockWeb.delete = function(id, type) {
+      var type = type || 0;
+
+      if (!id || type > INT_MAX) {
+        return root.$.Deferred().reject();
+      }
+
+      return root.$.ajax({
+        url: root.$.ajaxSettings.url + "/" + type + "/" + id,
+        method: 'DELETE'
       });
     };
 

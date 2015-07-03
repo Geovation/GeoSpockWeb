@@ -7,7 +7,7 @@
  * ***********************************************************************************************
  */
 
-var gulp = require('gulp');
+var gulp = require('gulp-help')(require('gulp'), {hideEmpty:true, hideDepsMessage:true});
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
@@ -19,28 +19,19 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var exec = require('child_process').exec;
 var sys = require('sys');
-var tasklist = require('gulp-task-listing');
 var runSequence = require('run-sequence');
 var karma = require('karma').server;
 var jeditor = require("gulp-json-editor");
 
 var PROJECT_BASE_PATH = __dirname + '';
 
-/*
- * gulp default task
- * ***********************************************************************************************
- */
-
-gulp.task('default', tasklist.withFilters(function(task) {
-    return (["build","clean","test","bump-major","bump-minor","bump-patch","release"].indexOf(task) < 0);
-}));
 
 /*
  * gulp main tasks
  * ***********************************************************************************************
  */
 
-gulp.task('build', ['pre-build'], function(cb) {
+gulp.task('build', 'Run all the tests and if they pass create the final js files', ['pre-build'], function(cb) {
   runSequence('update-version', cb);
 });
 
@@ -56,7 +47,7 @@ gulp.task('pre-build', ['clean', 'test'], function (cb) {
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('clean', function (cb) {
+gulp.task('clean', 'Delete dist folder',function (cb) {
   return del([
     './dist'
   ], cb);
@@ -74,7 +65,7 @@ gulp.task('bump-major', function(cb) {
     bumpHelper('major', cb);
 });
 
-gulp.task('test', ['lint', 'karma-tests'], function(cb) {
+gulp.task('test', 'Run style check and all tests', ['lint', 'karma-tests'], function(cb) {
   return gulp.src('.');
 });
 
@@ -158,15 +149,13 @@ gulp.task('update-version-js', function() {
 
 // continous integration tasks
 
-gulp.task('lint', function (cb) {
+gulp.task('lint', 'JS quality code check', function (cb) {
   return gulp.src('./src/*.js')
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('karma-tests', function(cb){
-    console.log('Run all the tests now');
-
+gulp.task('karma-tests', 'Run all the Karma tests', function(cb){
     karma.start({
         configFile: __dirname + '/test/karma.conf.js'
     }, cb );

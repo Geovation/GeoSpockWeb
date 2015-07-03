@@ -1,10 +1,9 @@
 /*
-*  This boilerplate javascript sdk is a collection of methods designed to make working with
-*  an Api as easy as possible.
+*  GeoSpockWeb SDK.
 *
-*  Learn more at https://github.com/monbro/javascript-sdk-boilerplate
+*  Learn more at https://github.com/Geovation/GeoSpockWeb
 *
-*  @author Michael Klein (klein@monbro.de)
+*  @author Sebastian Ovide (sebastian.ovide@geovation.uk)
 */
 
 /**
@@ -22,7 +21,7 @@ window.console.log = this.console.log || function() {};
  */
 (function(root) {
   root.GeoSpockWeb = root.GeoSpockWeb || {};
-  root.GeoSpockWeb.VERSION="0.0.1"; // It will be replaced by the build script
+  root.GeoSpockWeb.VERSION="0.0.2"; // It will be replaced by the build script
 }(this));
 
 /**

@@ -8,10 +8,9 @@
  */
 
 var gulp = require('gulp-help')(require('gulp'), {hideEmpty:true, hideDepsMessage:true});
-var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
-var uglify = require('gulp-uglify');
 var size = require('gulp-size');
 var del = require('del');
 var bump = require('gulp-bump');
@@ -22,6 +21,7 @@ var sys = require('sys');
 var runSequence = require('run-sequence');
 var karma = require('karma').server;
 var jeditor = require("gulp-json-editor");
+var browserify = require('gulp-browserify');
 
 var PROJECT_BASE_PATH = __dirname + '';
 
@@ -35,21 +35,31 @@ gulp.task('build', 'Run all the tests and if they pass create the final js files
   runSequence('update-version', cb);
 });
 
-gulp.task('pre-build', ['clean', 'test'], function (cb) {
-    var pkg = require('./package.json');
-
-    return gulp.src('./src/*.js')
-        .pipe(concat(pkg.name + '.js'))
-        .pipe(gulp.dest('./dist'))
-        .pipe(rename(pkg.name + '.min.js'))
-        .pipe(uglify())
-        .pipe(size({showFiles:true}))
-        .pipe(gulp.dest('./dist'));
+gulp.task('browserify', function() {
+  gulp.src('src/standalone.js')
+    .pipe(browserify({
+      insertGlobals : true,
+      debug : !gulp.env.production
+    }))
+    .pipe(gulp.dest('./build/js'))
 });
 
-gulp.task('clean', 'Delete dist folder',function (cb) {
+gulp.task('pre-build', ['clean', 'test'], function (cb) {
+  var pkg = require('./package.json');
+
+  return gulp.src('./build/js/*.js')
+    .pipe(concat(pkg.name + '.js'))
+    .pipe(gulp.dest('./dist'))
+    .pipe(rename(pkg.name + '.min.js'))
+    .pipe(uglify())
+    .pipe(size({showFiles:true}))
+    .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('clean', 'Delete dist and build folders',function (cb) {
   return del([
-    './dist'
+    './dist',
+    './build'
   ], cb);
 });
 
@@ -65,17 +75,7 @@ gulp.task('bump-major', function(cb) {
     bumpHelper('major', cb);
 });
 
-gulp.task('test', 'Run style check and all tests', ['lint', 'karma-tests'], function(cb) {
-  return gulp.src('.');
-});
-
-/*
- * gulp helper tasks
- * ***********************************************************************************************
- */
-
 // versioning tasks
-
 gulp.task('npm-bump-patch', function () {
   return gulp.src(['./package.json'])
     .pipe(bump({type:'patch'}))
@@ -146,20 +146,16 @@ gulp.task('update-version-js', function() {
     .pipe(gulp.dest('./dist/'));
 });
 
-
-// continous integration tasks
-
 gulp.task('lint', 'JS quality code check', function (cb) {
   return gulp.src('./src/*.js')
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('karma-tests', 'Run all the Karma tests', function(cb){
-    karma.start({
-        configFile: __dirname + '/test/karma.conf.js'
-    }, cb );
-
+gulp.task('karma-tests', 'Run all the Karma tests', ['browserify'], function(cb){
+  karma.start({
+    configFile: __dirname + '/test/karma.conf.js'
+  }, cb );
 });
 
 /*

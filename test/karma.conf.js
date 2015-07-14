@@ -10,7 +10,7 @@ module.exports = function(config){
           'test/unit/**/*.js',
 
           // now all the dependencies have been sorted, the app code can be loaded
-          'build/js/standalone.js'
+          'build/js/*.js'
         ],
 
         // list of files to exclude

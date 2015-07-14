@@ -10,21 +10,23 @@
  * main sdk
  */
 module.exports = function() {
-    var rest = require('rest');
-    var console = require("console-browserify");
+  'use strict';
+  
+  var rest = require('rest');
+  var console = require("console-browserify");
 
-    root.GeoSpockWeb = root.GeoSpockWeb || {};
-    var BASE_PATH = "/_ah/api/locatables/v2";
-    var INT_MAX = 2147483647;
+  root.GeoSpockWeb = root.GeoSpockWeb || {};
+  var BASE_PATH = "/_ah/api/locatables/v2";
+  var INT_MAX = 2147483647;
 
-    /**
-    * Contains all GeoSpockWeb API classes and functions.
-    * @name GeoSpockWeb
-    * @namespace
-    *
-    * Contains all GeoSpockWeb API classes and functions.
-    */
-    var GeoSpockWeb = root.GeoSpockWeb;
+  /**
+  * Contains all GeoSpockWeb API classes and functions.
+  * @name GeoSpockWeb
+  * @namespace
+  *
+  * Contains all GeoSpockWeb API classes and functions.
+  */
+  var GeoSpockWeb = root.GeoSpockWeb;
 
     // Set the server for GeoSpockWeb to talk to.
     // GeoSpockWeb.serverURL = "https://en.wikipedia.org";

@@ -2,7 +2,7 @@ GeoSpock Web [![Build Status](https://semaphoreci.com/api/v1/projects/cd83ab84-c
 ============
 
 A Web SDK for using GeoSpock APIs. Check out the [demo](https://raw.githubusercontent.com/Geovation/GeoSpockWeb/master/example/example1.html).
-This SDK is a wrapper around JQuery.ajax (see http://api.jquery.com/jquery.ajax/) and it laverages JQuery defers. All the SDK methods returns a deferred which is resolved when the ajax call succeed and fails if the ajax call enconters errors.
+This SDK is a thin wrapper around REST.js (see https://github.com/cujojs/rest) and therefore is uses WHEN.js promises (cujojs). All the SDK methods returns a promise which is resolved when the ajax call succeed and fails if the ajax call encounters errors.
 
 ### 1. Installation
 * ```bower install GeoSpockWeb```

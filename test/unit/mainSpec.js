@@ -5,6 +5,8 @@
     var serverUrl="http://www.example.com";
     var collideKey="anInterestingToken";
 
+    var xhr, requests;
+
     beforeEach(function() {
       jasmine.Ajax.install();
     });
@@ -14,223 +16,257 @@
     });
 
     describe("GeoSpockWeb object", function () {
-      it("should find jQuery", function () {
-        expect($).toBe(jQuery);
-      });
-
       it("should expose the sdk", function () {
         expect(GeoSpockWeb).toBeDefined();
       });
     });
 
-    describe("GeoSpockWeb.init", function () {
-      it("should have a method called init", function () {
-        expect(GeoSpockWeb.init).toBeDefined();
+    describe("GeoSpockWeb constructor", function () {
+      it("should be a function", function () {
+        expect(typeof GeoSpockWeb).toBe('function');
       });
 
-      it("should initialize the serverUrl and the CollideKey", function () {
-        GeoSpockWeb.init(serverUrl ,collideKey);
-        expect(GeoSpockWeb.serverUrl).toBe(serverUrl);
-        expect(GeoSpockWeb.CollideKey).toBe(collideKey);
+      it("should initialize the serverUrl and the collideKey", function () {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+
+        expect(geoSpockWeb.serverUrl).toBe(serverUrl);
+        expect(geoSpockWeb.collideKey).toBe(collideKey);
       });
 
-      it('sets ajax default url', function() {
-        GeoSpockWeb.init(serverUrl,collideKey);
-        var url = $.ajaxSetup();
-        expect($.ajaxSetup().url).toContain(serverUrl);
+      it("should fail if wrong parameters", function() {
+        expect(function() {new GeoSpockWeb()}).toThrow(new Error("serverUrl and collideKey are mandatory"));
+        expect(function() {new GeoSpockWeb(serverUrl)}).toThrow(new Error("serverUrl and collideKey are mandatory"));
+        expect(function() {new GeoSpockWeb(null, collideKey)}).toThrow(new Error("serverUrl and collideKey are mandatory"));
+        expect(function() {new GeoSpockWeb(null, null)}).toThrow(new Error("serverUrl and collideKey are mandatory"));
       });
 
-      it('should inizialize the ajax header with the token in CollideKey', function() {
-        GeoSpockWeb.init(serverUrl,collideKey);
-        var url = $.ajaxSetup();
-        expect($.ajaxSetup().headers.CollideKey).toBe(collideKey);
-      });
-
-      it('should inizialize the ajax header with the content type', function() {
-        GeoSpockWeb.init(serverUrl,collideKey);
-        var url = $.ajaxSetup();
-        expect($.ajaxSetup().headers['Content-Type']).toBe('application/json');
-      });
     });
 
     describe("GeoSpockWeb.post", function() {
       it('should be defined', function() {
-        expect(GeoSpockWeb.post).toBeDefined();
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        expect(geoSpockWeb.post).toBeDefined();
+      });
+
+      it('should fail if the data is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+
+        geoSpockWeb.post()
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('data parameter is mandatory.');
+            done();
+          });
+      });
+
+      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        var TYPE = 3000000000;
+
+        geoSpockWeb.post({}, TYPE)
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('type parameter cannot be bigger than 2147483647');
+            done();
+          });
       });
 
       it('should default type to 0', function() {
-        GeoSpockWeb.init(serverUrl,collideKey);
-        GeoSpockWeb.post({somedata:'somedata'});
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        geoSpockWeb.post({somedata:'somedata'});
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.url.slice(-2)).toBe("/0");
       });
 
-      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
-        var TYPE = 3000000000;
-
-        GeoSpockWeb.post({somedata:'somedata'}, TYPE)
-          .fail(function() {
-            done();
-            expect(true).toBe(true);
-          });
-      });
-
-      it('should fail if the data is not defined', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
-
-        GeoSpockWeb.post()
-          .fail(function() {
-            done();
-            expect(true).toBe(true);
-          });
-      });
-
       it('should post the given object', function() {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
         var DATA = {"somedata" : "somedata"};
-        GeoSpockWeb.init(serverUrl,collideKey);
-        GeoSpockWeb.post(DATA);
+        geoSpockWeb.post(DATA);
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.method).toBe('POST');
-        expect(request.data()).toEqual(DATA);
+        expect(request.params).toEqual(DATA);
       });
     });
 
     describe("GeoSpockWeb.get", function() {
       it('should be defined', function() {
-        expect(GeoSpockWeb.get).toBeDefined();
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        expect(geoSpockWeb.get).toBeDefined();
+      });
+
+      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        var TYPE = 3000000000;
+        var ID = 1234;
+
+        geoSpockWeb.get(ID, TYPE)
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('type parameter cannot be bigger than 2147483647');
+            done();
+          });
+      });
+
+      it('should fail if the id is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+
+        geoSpockWeb.get()
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('id parameter is mandatory.');
+            done();
+          });
       });
 
       it('should default type to 0', function() {
         var ID = 1234;
-        GeoSpockWeb.init(serverUrl,collideKey);
-        GeoSpockWeb.get(ID);
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        geoSpockWeb.get(ID);
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
-      });
-
-      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
-        var TYPE = 3000000000;
-        var ID = 1234;
-
-        GeoSpockWeb.get(ID, TYPE)
-          .fail(function() {
-            done();
-            expect(true).toBe(true);
-          });
-      });
-
-      it('should fail if the ID is not defined', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
-
-        GeoSpockWeb.get()
-          .fail(function() {
-            done();
-            expect(true).toBe(true);
-          });
       });
     });
 
+
+
     describe("GeoSpockWeb.put", function() {
       it('should be defined', function() {
-        expect(GeoSpockWeb.put).toBeDefined();
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        expect(geoSpockWeb.put).toBeDefined();
       });
 
       it('should default type to 0', function() {
         var DATA = {"somedata" : "some data"};
         var ID = 1234;
-        GeoSpockWeb.init(serverUrl,collideKey);
-        GeoSpockWeb.put(ID, DATA);
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        geoSpockWeb.put(ID, DATA);
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
       });
 
       it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
         var TYPE = 3000000000;
         var ID = 1234;
         var DATA = {"somedata" : "some data"};
 
-        GeoSpockWeb.put(ID, DATA, TYPE)
-          .fail(function() {
+        geoSpockWeb.put(ID, DATA, TYPE)
+          .then(function(result) {
+            expect(result).toBe('failed');
             done();
-            expect(true).toBe(true);
+          })
+          .catch(function(result) {
+            expect(result).toBe('type parameter cannot be bigger than 2147483647');
+            done();
+          });
+      });
+
+      it('should fail if the id is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+
+        geoSpockWeb.put()
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('id parameter is mandatory.');
+            done();
           });
       });
 
       it('should fail if the data is not defined', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
         var ID = 1234;
-        GeoSpockWeb.put(ID)
-          .fail(function() {
+
+        geoSpockWeb.put(ID)
+          .then(function(result) {
+            expect(result).toBe('failed');
             done();
-            expect(true).toBe(true);
+          })
+          .catch(function(result) {
+            expect(result).toBe('data parameter is mandatory.');
+            done();
           });
       });
 
-      it('should fail if the ID is not defined', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
-
-        GeoSpockWeb.put()
-          .fail(function() {
-            done();
-            expect(true).toBe(true);
-          });
-      });
-
-      it('should put the given object', function() {
+      it('should post the given object', function() {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
         var DATA = {"somedata" : "some data"};
         var ID = 1234;
-        GeoSpockWeb.init(serverUrl,collideKey);
-        GeoSpockWeb.put(ID, DATA);
+        geoSpockWeb.put(ID, DATA);
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.method).toBe('PUT');
-        expect(request.data()).toEqual(DATA);
+        expect(request.params).toEqual(DATA);
       });
+
     });
 
+
+
     describe("GeoSpockWeb.delete", function() {
-      it("should be defined", function () {
-        expect(GeoSpockWeb.delete).toBeDefined();
+      it('should be defined', function() {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        expect(geoSpockWeb.delete).toBeDefined();
       });
 
       it('should default type to 0', function() {
         var ID = 1234;
-        GeoSpockWeb.init(serverUrl,collideKey);
-        GeoSpockWeb.delete(ID);
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        geoSpockWeb.delete(ID);
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
       });
 
       it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
         var TYPE = 3000000000;
         var ID = 1234;
 
-        GeoSpockWeb.delete(ID, TYPE)
-          .fail(function() {
+        geoSpockWeb.delete(ID, TYPE)
+          .then(function(result) {
+            expect(result).toBe('failed');
             done();
-            expect(true).toBe(true);
+          })
+          .catch(function(result) {
+            expect(result).toBe('type parameter cannot be bigger than 2147483647');
+            done();
           });
       });
 
-      it('should fail if the ID is not defined', function(done) {
-        GeoSpockWeb.init(serverUrl,collideKey);
+      it('should fail if the id is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
 
-        GeoSpockWeb.delete()
-          .fail(function() {
+        geoSpockWeb.delete()
+          .then(function(result) {
+            expect(result).toBe('failed');
             done();
-            expect(true).toBe(true);
+          })
+          .catch(function(result) {
+            expect(result).toBe('id parameter is mandatory.');
+            done();
           });
       });
     });
+
   });
 
 

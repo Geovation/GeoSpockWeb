@@ -12,14 +12,12 @@
       }
     </style>
     <title>Usage example for the GeoSpockWeb</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="../dist/geospockweb.js"></script>
+    <script src="server.js"></script>
     <script>
-        var serverUrl = "SERVER_URL";
-        var apiKey = "API_KEY";
 
         // initialize the sdk by giving your personal api token
-        GeoSpockWeb.init(serverUrl, apiKey);
+        var geoSpockWeb = new GeoSpockWeb(serverUrl, apiKey);
 
         // use the sdk for your needs, this call should print data from wikipedia about cheese in the console
         var body = {
@@ -60,24 +58,24 @@
           ]
         };
 
-        GeoSpockWeb
+        geoSpockWeb
           .post(body)
           .then(function(response) {
-            console.log("Response from the server: " + response);
-            response.locatables.forEach(function(locatable){
+            console.log("Response from the server: " + JSON.stringify(response));
+            JSON.parse(response.entity).locatables.forEach(function(locatable){
               console.log("Quering locatable id : " + locatable.id);
 
-              GeoSpockWeb
+              geoSpockWeb
                 .get(locatable.id)
                 .then(function(res) {
-                  console.log(res);
+                  console.log(JSON.stringify(res));
                 })
-                .fail(function(){
+                .catch(function(){
                   console.log("Something went wrong doing get");
                 });
             });
           })
-          .fail(function(){
+          .catch(function(){
             console.log("Something went wrong doing post");
           });
 

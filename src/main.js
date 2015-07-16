@@ -92,27 +92,38 @@ module.exports = function(serverUrl, collideKey) {
     });
   };
 
+  /**
+  * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/update-a-single-locatable
+  */
+  this.put = function(id, data, _type) {
+    var type = _type || 0;
+
+    if (!id) {
+      return when.reject('id parameter is mandatory.');
+    }
+
+    if (!data) {
+      return when.reject('data parameter is mandatory.');
+    }
+
+    if (type > INT_MAX) {
+      return when.reject('type parameter cannot be bigger than ' + INT_MAX);
+    }
+
+    return rest({
+      headers: headers,
+      method: 'PUT',
+      path: prefix + "/" + type + "/" + id,
+      entity: data
+    });
+  };
+
 };
 
 
 
 
-    /**
-     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/update-a-single-locatable
-     */
-    // GeoSpockWeb.put = function(id, data, type) {
-    //   var type = type || 0;
-    //
-    //   if (!data || !id || type > INT_MAX) {
-    //     return root.$.Deferred().reject();
-    //   }
-    //
-    //   return root.$.ajax({
-    //     url: root.$.ajaxSettings.url + "/" + type + "/" + id,
-    //     method: 'PUT',
-    //     data: JSON.stringify(data)
-    //   });
-    // };
+
 
     /**
      * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/delete-a-single-locatable

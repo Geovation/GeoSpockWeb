@@ -8394,7 +8394,7 @@ if (typeof global.window.define === 'function' && global.window.define.amd) {
   global.window.GeoSpockWeb = GeoSpockWeb;
 }
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_29518c9c.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_cda5bf2c.js","/")
 },{"./main.js":59,"1YiZ5S":8,"buffer":4}],59:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*
@@ -8491,27 +8491,38 @@ module.exports = function(serverUrl, collideKey) {
     });
   };
 
+  /**
+  * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/update-a-single-locatable
+  */
+  this.put = function(id, data, _type) {
+    var type = _type || 0;
+
+    if (!id) {
+      return when.reject('id parameter is mandatory.');
+    }
+
+    if (!data) {
+      return when.reject('data parameter is mandatory.');
+    }
+
+    if (type > INT_MAX) {
+      return when.reject('type parameter cannot be bigger than ' + INT_MAX);
+    }
+
+    return rest({
+      headers: headers,
+      method: 'PUT',
+      path: prefix + "/" + type + "/" + id,
+      entity: data
+    });
+  };
+
 };
 
 
 
 
-    /**
-     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/update-a-single-locatable
-     */
-    // GeoSpockWeb.put = function(id, data, type) {
-    //   var type = type || 0;
-    //
-    //   if (!data || !id || type > INT_MAX) {
-    //     return root.$.Deferred().reject();
-    //   }
-    //
-    //   return root.$.ajax({
-    //     url: root.$.ajaxSettings.url + "/" + type + "/" + id,
-    //     method: 'PUT',
-    //     data: JSON.stringify(data)
-    //   });
-    // };
+
 
     /**
      * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/delete-a-single-locatable

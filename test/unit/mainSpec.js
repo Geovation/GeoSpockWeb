@@ -337,68 +337,85 @@
     });
 
 
-    // });
-    //
-    // describe("GeoSpockWeb.put", function() {
-    //   it('should be defined', function() {
-    //     expect(GeoSpockWeb.put).toBeDefined();
-    //   });
-    //
-    //   it('should default type to 0', function() {
-    //     var DATA = {"somedata" : "some data"};
-    //     var ID = 1234;
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     GeoSpockWeb.put(ID, DATA);
-    //
-    //     var request = jasmine.Ajax.requests.mostRecent();
-    //     expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
-    //   });
-    //
-    //   it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     var TYPE = 3000000000;
-    //     var ID = 1234;
-    //     var DATA = {"somedata" : "some data"};
-    //
-    //     GeoSpockWeb.put(ID, DATA, TYPE)
-    //       .fail(function() {
-    //         done();
-    //         expect(true).toBe(true);
-    //       });
-    //   });
-    //
-    //   it('should fail if the data is not defined', function(done) {
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     var ID = 1234;
-    //     GeoSpockWeb.put(ID)
-    //       .fail(function() {
-    //         done();
-    //         expect(true).toBe(true);
-    //       });
-    //   });
-    //
-    //   it('should fail if the ID is not defined', function(done) {
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //
-    //     GeoSpockWeb.put()
-    //       .fail(function() {
-    //         done();
-    //         expect(true).toBe(true);
-    //       });
-    //   });
-    //
-    //   it('should put the given object', function() {
-    //     var DATA = {"somedata" : "some data"};
-    //     var ID = 1234;
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     GeoSpockWeb.put(ID, DATA);
-    //
-    //     var request = jasmine.Ajax.requests.mostRecent();
-    //     expect(request.method).toBe('PUT');
-    //     expect(request.data()).toEqual(DATA);
-    //   });
-    // });
-    //
+
+    describe("GeoSpockWeb.put", function() {
+      it('should be defined', function() {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        expect(geoSpockWeb.put).toBeDefined();
+      });
+
+      it('should default type to 0', function() {
+        var DATA = {"somedata" : "some data"};
+        var ID = 1234;
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        geoSpockWeb.put(ID, DATA);
+
+        var request = jasmine.Ajax.requests.mostRecent();
+        expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
+      });
+
+      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        var TYPE = 3000000000;
+        var ID = 1234;
+        var DATA = {"somedata" : "some data"};
+
+        geoSpockWeb.put(ID, DATA, TYPE)
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('type parameter cannot be bigger than 2147483647');
+            done();
+          });
+      });
+
+      it('should fail if the id is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+
+        geoSpockWeb.put()
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('id parameter is mandatory.');
+            done();
+          });
+      });
+
+      it('should fail if the data is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        var ID = 1234;
+
+        geoSpockWeb.put(ID)
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('data parameter is mandatory.');
+            done();
+          });
+      });
+
+      it('should post the given object', function() {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        var DATA = {"somedata" : "some data"};
+        var ID = 1234;
+        geoSpockWeb.put(ID, DATA);
+
+        var request = jasmine.Ajax.requests.mostRecent();
+        expect(request.method).toBe('PUT');
+        expect(request.params).toEqual(DATA);
+      });
+
+
+    });
+
+
+
     // describe("GeoSpockWeb.delete", function() {
     //   it("should be defined", function () {
     //     expect(GeoSpockWeb.delete).toBeDefined();

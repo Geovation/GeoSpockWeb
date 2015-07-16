@@ -71,41 +71,31 @@ module.exports = function(serverUrl, collideKey) {
     });
   };
 
+  /**
+   * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/get-a-single-locatable
+   */
+  this.get = function(id, _type) {
+    var type = _type || 0;
+
+    if (!id) {
+      return when.reject('id parameter is mandatory.');
+    }
+
+    if (type > INT_MAX) {
+      return when.reject('type parameter cannot be bigger than ' + INT_MAX);
+    }
+
+    return rest({
+      headers: headers,
+      method: 'GET',
+      path: prefix + "/" + type + "/" + id
+    });
+  };
+
 };
 
 
-    /**
-     * http://docs.geospock.apiary.io/#reference/locatables/uploading-data/create-new-locatables
-     */
-    // GeoSpockWeb.post = function(data, type) {
-    //   var type = type || 0;
-    //
-    //   if (!data || type > INT_MAX) {
-    //     return root.$.Deferred().reject();
-    //   }
-    //
-    //   return root.$.ajax({
-    //     url: root.$.ajaxSettings.url + "/" + type,
-    //     method: 'POST',
-    //     data: JSON.stringify(data)
-    //   });
-    // };
 
-    /**
-     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/get-a-single-locatable
-     */
-    // GeoSpockWeb.get = function(id, type) {
-    //   var type = type || 0;
-    //
-    //   if (!id || type > INT_MAX) {
-    //     return root.$.Deferred().reject();
-    //   }
-    //
-    //   return root.$.ajax({
-    //     url: root.$.ajaxSettings.url + "/" + type + "/" + id,
-    //     method: 'GET'
-    //   });
-    // };
 
     /**
      * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/update-a-single-locatable

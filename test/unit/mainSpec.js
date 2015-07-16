@@ -290,45 +290,53 @@
       });
     });
 
+    describe("GeoSpockWeb.get", function() {
+      it('should be defined', function() {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        expect(geoSpockWeb.get).toBeDefined();
+      });
+
+      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        var TYPE = 3000000000;
+        var ID = 1234;
+
+        geoSpockWeb.get(ID, TYPE)
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('type parameter cannot be bigger than 2147483647');
+            done();
+          });
+      });
+
+      it('should fail if the id is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+
+        geoSpockWeb.get()
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('id parameter is mandatory.');
+            done();
+          });
+      });
+
+      it('should default type to 0', function() {
+        var ID = 1234;
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        geoSpockWeb.get(ID);
+
+        var request = jasmine.Ajax.requests.mostRecent();
+        expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
+      });
+    });
 
 
-
-    //
-    // describe("GeoSpockWeb.get", function() {
-    //   it('should be defined', function() {
-    //     expect(GeoSpockWeb.get).toBeDefined();
-    //   });
-    //
-    //   it('should default type to 0', function() {
-    //     var ID = 1234;
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     GeoSpockWeb.get(ID);
-    //
-    //     var request = jasmine.Ajax.requests.mostRecent();
-    //     expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
-    //   });
-    //
-    //   it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     var TYPE = 3000000000;
-    //     var ID = 1234;
-    //
-    //     GeoSpockWeb.get(ID, TYPE)
-    //       .fail(function() {
-    //         done();
-    //         expect(true).toBe(true);
-    //       });
-    //   });
-    //
-    //   it('should fail if the ID is not defined', function(done) {
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //
-    //     GeoSpockWeb.get()
-    //       .fail(function() {
-    //         done();
-    //         expect(true).toBe(true);
-    //       });
-    //   });
     // });
     //
     // describe("GeoSpockWeb.put", function() {

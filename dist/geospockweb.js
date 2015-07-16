@@ -8394,7 +8394,7 @@ if (typeof global.window.define === 'function' && global.window.define.amd) {
   global.window.GeoSpockWeb = GeoSpockWeb;
 }
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_8ec71d5b.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_3a156a89.js","/")
 },{"./main.js":59,"1YiZ5S":8,"buffer":4}],59:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*

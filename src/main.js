@@ -9,45 +9,45 @@
 /**
  * main sdk
  */
-module.exports = function() {
-  'use strict';
-  
-  var rest = require('rest');
-  var console = require("console-browserify");
+// module.exports = {
+//   init: function() {}
+// };
 
-  root.GeoSpockWeb = root.GeoSpockWeb || {};
+module.exports = function(serverUrl, collideKey) {
+  'use strict';
+
+  if (!serverUrl || !collideKey) {
+    throw new Error('serverUrl and collideKey are mandatory');
+  }
+
+  this.serverUrl = serverUrl;
+  this.collideKey = collideKey;
+
   var BASE_PATH = "/_ah/api/locatables/v2";
   var INT_MAX = 2147483647;
+  var rest = require('rest');
+  var console = require("console-browserify");
+  var pathPrefix = require('rest/interceptor/pathPrefix');
+  var defaultRequest = require('rest/interceptor/defaultRequest');
 
-  /**
-  * Contains all GeoSpockWeb API classes and functions.
-  * @name GeoSpockWeb
-  * @namespace
-  *
-  * Contains all GeoSpockWeb API classes and functions.
-  */
-  var GeoSpockWeb = root.GeoSpockWeb;
 
-    // Set the server for GeoSpockWeb to talk to.
-    // GeoSpockWeb.serverURL = "https://en.wikipedia.org";
+  // exposes low level
+  this.rest = rest;
 
-    /**
-     * Call this method first to set your authentication key.
-     * @param {String} API Token
-     */
-    // GeoSpockWeb.init = function(serverUrl, collideKey) {
-    //   GeoSpockWeb.serverUrl = serverUrl;
-    //   GeoSpockWeb.CollideKey = collideKey;
-    //
-    //   // Set ajax defaults
-    //   root.$.ajaxSetup({
-    //     url: serverUrl + BASE_PATH,
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'CollideKey': collideKey
-    //     }
-    //   });
-    // };
+  // For some reason this code breaks the tests. For now we are using rest
+  // without wraps which is a really petty as we are loosing all the REST.js
+  // benefits, but until we cannot fix the tests, we don't have other alternatives.
+  this.client = rest
+    .wrap(defaultRequest, {
+      headers: {
+        'Content-Type': 'application/json',
+        'CollideKey': collideKey
+      }
+    })
+    .wrap(pathPrefix, { prefix: serverUrl + BASE_PATH });
+
+};
+
 
     /**
      * http://docs.geospock.apiary.io/#reference/locatables/uploading-data/create-new-locatables
@@ -115,4 +115,4 @@ module.exports = function() {
     //   });
     // };
 
-};
+//};

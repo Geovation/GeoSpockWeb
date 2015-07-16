@@ -10,7 +10,9 @@ module.exports = function(config){
           'test/unit/**/*.js',
 
           // now all the dependencies have been sorted, the app code can be loaded
-          'build/js/*.js'
+          'build/js/*.js',
+          // 'node_modules/fakerest/dist/FakeRest.min.js',
+          // 'node_modules/sinon/pkg/sinon.js'
         ],
 
         // list of files to exclude
@@ -67,6 +69,23 @@ module.exports = function(config){
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch : false,
 
+        customLaunchers: {
+          'PhantomJS_Custom': {
+            base: 'PhantomJS',
+            options: {
+              settings: {
+                webSecurityEnabled: false
+              },
+            },
+            debug: false
+          }
+        },
+
+        phantomjsLauncher: {
+          // Have phantomjs exit if a ResourceError is encountered (useful if karma exits without killing phantom)
+          exitOnResourceError: true
+        },
+
         // Start these browsers, currently available:
         // - Chrome
         // - ChromeCanary
@@ -75,10 +94,14 @@ module.exports = function(config){
         // - Safari (only Mac)
         // - PhantomJS
         // - IE (only Windows)
+//        browsers : ['PhantomJS_Custom'],
+//        browsers : ['Chrome'],
         browsers : ['PhantomJS'],
 
         // If browser does not capture in given timeout [ms], kill it
         captureTimeout : 60000,
+
+    //    browserNoActivityTimeout : 100000,
 
         // Continuous Integration mode
         // if true, it capture browsers, run tests and exit

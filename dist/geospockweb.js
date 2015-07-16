@@ -2716,7 +2716,7 @@ function hasOwnProperty(obj, prop) {
 ));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/UrlBuilder.js","/../node_modules/rest")
-},{"./util/mixin":34,"1YiZ5S":8,"buffer":4}],12:[function(require,module,exports){
+},{"./util/mixin":37,"1YiZ5S":8,"buffer":4}],12:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*
  * Copyright 2014 the original author or authors
@@ -3119,7 +3119,322 @@ function hasOwnProperty(obj, prop) {
 ));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/client/xhr.js","/../node_modules/rest/client")
-},{"../UrlBuilder":11,"../client":13,"../util/normalizeHeaderName":35,"../util/responsePromise":36,"1YiZ5S":8,"buffer":4,"when":33}],16:[function(require,module,exports){
+},{"../UrlBuilder":11,"../client":13,"../util/normalizeHeaderName":38,"../util/responsePromise":39,"1YiZ5S":8,"buffer":4,"when":36}],16:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+/*
+ * Copyright 2012-2015 the original author or authors
+ * @license MIT, see LICENSE.txt for details
+ *
+ * @author Scott Andrews
+ */
+
+(function (define) {
+	'use strict';
+
+	define(function (require) {
+
+		var defaultClient, mixin, responsePromise, client, when;
+
+		defaultClient = require('./client/default');
+		mixin = require('./util/mixin');
+		responsePromise = require('./util/responsePromise');
+		client = require('./client');
+		when = require('when');
+
+		/**
+		 * Interceptors have the ability to intercept the request and/org response
+		 * objects.  They may augment, prune, transform or replace the
+		 * request/response as needed.  Clients may be composed by wrapping
+		 * together multiple interceptors.
+		 *
+		 * Configured interceptors are functional in nature.  Wrapping a client in
+		 * an interceptor will not affect the client, merely the data that flows in
+		 * and out of that client.  A common configuration can be created once and
+		 * shared; specialization can be created by further wrapping that client
+		 * with custom interceptors.
+		 *
+		 * @param {Client} [target] client to wrap
+		 * @param {Object} [config] configuration for the interceptor, properties will be specific to the interceptor implementation
+		 * @returns {Client} A client wrapped with the interceptor
+		 *
+		 * @class Interceptor
+		 */
+
+		function defaultInitHandler(config) {
+			return config;
+		}
+
+		function defaultRequestHandler(request /*, config, meta */) {
+			return request;
+		}
+
+		function defaultResponseHandler(response /*, config, meta */) {
+			return response;
+		}
+
+		function race(promisesOrValues) {
+			// this function is different than when.any as the first to reject also wins
+			return when.promise(function (resolve, reject) {
+				promisesOrValues.forEach(function (promiseOrValue) {
+					when(promiseOrValue, resolve, reject);
+				});
+			});
+		}
+
+		/**
+		 * Alternate return type for the request handler that allows for more complex interactions.
+		 *
+		 * @param properties.request the traditional request return object
+		 * @param {Promise} [properties.abort] promise that resolves if/when the request is aborted
+		 * @param {Client} [properties.client] override the defined client with an alternate client
+		 * @param [properties.response] response for the request, short circuit the request
+		 */
+		function ComplexRequest(properties) {
+			if (!(this instanceof ComplexRequest)) {
+				// in case users forget the 'new' don't mix into the interceptor
+				return new ComplexRequest(properties);
+			}
+			mixin(this, properties);
+		}
+
+		/**
+		 * Create a new interceptor for the provided handlers.
+		 *
+		 * @param {Function} [handlers.init] one time intialization, must return the config object
+		 * @param {Function} [handlers.request] request handler
+		 * @param {Function} [handlers.response] response handler regardless of error state
+		 * @param {Function} [handlers.success] response handler when the request is not in error
+		 * @param {Function} [handlers.error] response handler when the request is in error, may be used to 'unreject' an error state
+		 * @param {Function} [handlers.client] the client to use if otherwise not specified, defaults to platform default client
+		 *
+		 * @returns {Interceptor}
+		 */
+		function interceptor(handlers) {
+
+			var initHandler, requestHandler, successResponseHandler, errorResponseHandler;
+
+			handlers = handlers || {};
+
+			initHandler            = handlers.init    || defaultInitHandler;
+			requestHandler         = handlers.request || defaultRequestHandler;
+			successResponseHandler = handlers.success || handlers.response || defaultResponseHandler;
+			errorResponseHandler   = handlers.error   || function () {
+				// Propagate the rejection, with the result of the handler
+				return when((handlers.response || defaultResponseHandler).apply(this, arguments), when.reject, when.reject);
+			};
+
+			return function (target, config) {
+
+				if (typeof target === 'object') {
+					config = target;
+				}
+				if (typeof target !== 'function') {
+					target = handlers.client || defaultClient;
+				}
+
+				config = initHandler(config || {});
+
+				function interceptedClient(request) {
+					var context, meta;
+					context = {};
+					meta = { 'arguments': Array.prototype.slice.call(arguments), client: interceptedClient };
+					request = typeof request === 'string' ? { path: request } : request || {};
+					request.originator = request.originator || interceptedClient;
+					return responsePromise(
+						requestHandler.call(context, request, config, meta),
+						function (request) {
+							var response, abort, next;
+							next = target;
+							if (request instanceof ComplexRequest) {
+								// unpack request
+								abort = request.abort;
+								next = request.client || next;
+								response = request.response;
+								// normalize request, must be last
+								request = request.request;
+							}
+							response = response || when(request, function (request) {
+								return when(
+									next(request),
+									function (response) {
+										return successResponseHandler.call(context, response, config, meta);
+									},
+									function (response) {
+										return errorResponseHandler.call(context, response, config, meta);
+									}
+								);
+							});
+							return abort ? race([response, abort]) : response;
+						},
+						function (error) {
+							return when.reject({ request: request, error: error });
+						}
+					);
+				}
+
+				return client(interceptedClient, target);
+			};
+		}
+
+		interceptor.ComplexRequest = ComplexRequest;
+
+		return interceptor;
+
+	});
+
+}(
+	typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); }
+	// Boilerplate for AMD and Node
+));
+
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/interceptor.js","/../node_modules/rest")
+},{"./client":13,"./client/default":14,"./util/mixin":37,"./util/responsePromise":39,"1YiZ5S":8,"buffer":4,"when":36}],17:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+/*
+ * Copyright 2013 the original author or authors
+ * @license MIT, see LICENSE.txt for details
+ *
+ * @author Scott Andrews
+ */
+
+(function (define) {
+	'use strict';
+
+	define(function (require) {
+
+		var interceptor, mixinUtil, defaulter;
+
+		interceptor = require('../interceptor');
+		mixinUtil = require('../util/mixin');
+
+		defaulter = (function () {
+
+			function mixin(prop, target, defaults) {
+				if (prop in target || prop in defaults) {
+					target[prop] = mixinUtil({}, defaults[prop], target[prop]);
+				}
+			}
+
+			function copy(prop, target, defaults) {
+				if (prop in defaults && !(prop in target)) {
+					target[prop] = defaults[prop];
+				}
+			}
+
+			var mappings = {
+				method: copy,
+				path: copy,
+				params: mixin,
+				headers: mixin,
+				entity: copy,
+				mixin: mixin
+			};
+
+			return function (target, defaults) {
+				for (var prop in mappings) {
+					/*jshint forin: false */
+					mappings[prop](prop, target, defaults);
+				}
+				return target;
+			};
+
+		}());
+
+		/**
+		 * Provide default values for a request. These values will be applied to the
+		 * request if the request object does not already contain an explicit value.
+		 *
+		 * For 'params', 'headers', and 'mixin', individual values are mixed in with the
+		 * request's values. The result is a new object representiing the combined
+		 * request and config values. Neither input object is mutated.
+		 *
+		 * @param {Client} [client] client to wrap
+		 * @param {string} [config.method] the default method
+		 * @param {string} [config.path] the default path
+		 * @param {Object} [config.params] the default params, mixed with the request's existing params
+		 * @param {Object} [config.headers] the default headers, mixed with the request's existing headers
+		 * @param {Object} [config.mixin] the default "mixins" (http/https options), mixed with the request's existing "mixins"
+		 *
+		 * @returns {Client}
+		 */
+		return interceptor({
+			request: function handleRequest(request, config) {
+				return defaulter(request, config);
+			}
+		});
+
+	});
+
+}(
+	typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); }
+	// Boilerplate for AMD and Node
+));
+
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/interceptor/defaultRequest.js","/../node_modules/rest/interceptor")
+},{"../interceptor":16,"../util/mixin":37,"1YiZ5S":8,"buffer":4}],18:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+/*
+ * Copyright 2012-2013 the original author or authors
+ * @license MIT, see LICENSE.txt for details
+ *
+ * @author Scott Andrews
+ */
+
+(function (define) {
+	'use strict';
+
+	define(function (require) {
+
+		var interceptor, UrlBuilder;
+
+		interceptor = require('../interceptor');
+		UrlBuilder = require('../UrlBuilder');
+
+		function startsWith(str, prefix) {
+			return str.indexOf(prefix) === 0;
+		}
+
+		function endsWith(str, suffix) {
+			return str.lastIndexOf(suffix) + suffix.length === str.length;
+		}
+
+		/**
+		 * Prefixes the request path with a common value.
+		 *
+		 * @param {Client} [client] client to wrap
+		 * @param {number} [config.prefix] path prefix
+		 *
+		 * @returns {Client}
+		 */
+		return interceptor({
+			request: function (request, config) {
+				var path;
+
+				if (config.prefix && !(new UrlBuilder(request.path).isFullyQualified())) {
+					path = config.prefix;
+					if (request.path) {
+						if (!endsWith(path, '/') && !startsWith(request.path, '/')) {
+							// add missing '/' between path sections
+							path += '/';
+						}
+						path += request.path;
+					}
+					request.path = path;
+				}
+
+				return request;
+			}
+		});
+
+	});
+
+}(
+	typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); }
+	// Boilerplate for AMD and Node
+));
+
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/interceptor/pathPrefix.js","/../node_modules/rest/interceptor")
+},{"../UrlBuilder":11,"../interceptor":16,"1YiZ5S":8,"buffer":4}],19:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3140,7 +3455,7 @@ define(function (require) {
 })(typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); });
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/Promise.js","/../node_modules/rest/node_modules/when/lib")
-},{"./Scheduler":17,"./env":29,"./makePromise":31,"1YiZ5S":8,"buffer":4}],17:[function(require,module,exports){
+},{"./Scheduler":20,"./env":32,"./makePromise":34,"1YiZ5S":8,"buffer":4}],20:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3224,7 +3539,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/Scheduler.js","/../node_modules/rest/node_modules/when/lib")
-},{"1YiZ5S":8,"buffer":4}],18:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],21:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3254,7 +3569,7 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/TimeoutError.js","/../node_modules/rest/node_modules/when/lib")
-},{"1YiZ5S":8,"buffer":4}],19:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],22:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3313,7 +3628,7 @@ define(function() {
 
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/apply.js","/../node_modules/rest/node_modules/when/lib")
-},{"1YiZ5S":8,"buffer":4}],20:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],23:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3606,7 +3921,7 @@ define(function(require) {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/array.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"../apply":19,"../state":32,"1YiZ5S":8,"buffer":4}],21:[function(require,module,exports){
+},{"../apply":22,"../state":35,"1YiZ5S":8,"buffer":4}],24:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3770,7 +4085,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/flow.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"1YiZ5S":8,"buffer":4}],22:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],25:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3801,7 +4116,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/fold.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"1YiZ5S":8,"buffer":4}],23:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],26:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3825,7 +4140,7 @@ define(function(require) {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/inspect.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"../state":32,"1YiZ5S":8,"buffer":4}],24:[function(require,module,exports){
+},{"../state":35,"1YiZ5S":8,"buffer":4}],27:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3894,7 +4209,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/iterate.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"1YiZ5S":8,"buffer":4}],25:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],28:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -3922,7 +4237,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/progress.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"1YiZ5S":8,"buffer":4}],26:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],29:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -4004,7 +4319,7 @@ define(function(require) {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/timed.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"../TimeoutError":18,"../env":29,"1YiZ5S":8,"buffer":4}],27:[function(require,module,exports){
+},{"../TimeoutError":21,"../env":32,"1YiZ5S":8,"buffer":4}],30:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -4094,7 +4409,7 @@ define(function(require) {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/unhandledRejection.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"../env":29,"../format":30,"1YiZ5S":8,"buffer":4}],28:[function(require,module,exports){
+},{"../env":32,"../format":33,"1YiZ5S":8,"buffer":4}],31:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -4136,7 +4451,7 @@ define(function() {
 
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/decorators/with.js","/../node_modules/rest/node_modules/when/lib/decorators")
-},{"1YiZ5S":8,"buffer":4}],29:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],32:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -4213,7 +4528,7 @@ define(function(require) {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/env.js","/../node_modules/rest/node_modules/when/lib")
-},{"1YiZ5S":8,"buffer":4}],30:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],33:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -4273,7 +4588,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/format.js","/../node_modules/rest/node_modules/when/lib")
-},{"1YiZ5S":8,"buffer":4}],31:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -5204,7 +5519,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/makePromise.js","/../node_modules/rest/node_modules/when/lib")
-},{"1YiZ5S":8,"buffer":4}],32:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],35:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
@@ -5243,7 +5558,7 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/lib/state.js","/../node_modules/rest/node_modules/when/lib")
-},{"1YiZ5S":8,"buffer":4}],33:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],36:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 
@@ -5475,7 +5790,7 @@ define(function (require) {
 })(typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); });
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/node_modules/when/when.js","/../node_modules/rest/node_modules/when")
-},{"./lib/Promise":16,"./lib/TimeoutError":18,"./lib/apply":19,"./lib/decorators/array":20,"./lib/decorators/flow":21,"./lib/decorators/fold":22,"./lib/decorators/inspect":23,"./lib/decorators/iterate":24,"./lib/decorators/progress":25,"./lib/decorators/timed":26,"./lib/decorators/unhandledRejection":27,"./lib/decorators/with":28,"1YiZ5S":8,"buffer":4}],34:[function(require,module,exports){
+},{"./lib/Promise":19,"./lib/TimeoutError":21,"./lib/apply":22,"./lib/decorators/array":23,"./lib/decorators/flow":24,"./lib/decorators/fold":25,"./lib/decorators/inspect":26,"./lib/decorators/iterate":27,"./lib/decorators/progress":28,"./lib/decorators/timed":29,"./lib/decorators/unhandledRejection":30,"./lib/decorators/with":31,"1YiZ5S":8,"buffer":4}],37:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*
  * Copyright 2012-2013 the original author or authors
@@ -5527,7 +5842,7 @@ define(function (require) {
 ));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/util/mixin.js","/../node_modules/rest/util")
-},{"1YiZ5S":8,"buffer":4}],35:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],38:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*
  * Copyright 2012 the original author or authors
@@ -5569,7 +5884,7 @@ define(function (require) {
 ));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/util/normalizeHeaderName.js","/../node_modules/rest/util")
-},{"1YiZ5S":8,"buffer":4}],36:[function(require,module,exports){
+},{"1YiZ5S":8,"buffer":4}],39:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*
  * Copyright 2014-2015 the original author or authors
@@ -5713,7 +6028,7 @@ define(function (require) {
 ));
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/../node_modules/rest/util/responsePromise.js","/../node_modules/rest/util")
-},{"./normalizeHeaderName":35,"1YiZ5S":8,"buffer":4,"when":33}],37:[function(require,module,exports){
+},{"./normalizeHeaderName":38,"1YiZ5S":8,"buffer":4,"when":36}],40:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 // Used for Web and AMD
 var GeoSpockWeb = require('./main.js');
@@ -5723,8 +6038,8 @@ if (typeof global.window.define === 'function' && global.window.define.amd) {
   global.window.GeoSpockWeb = GeoSpockWeb;
 }
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_62afe994.js","/")
-},{"./main.js":38,"1YiZ5S":8,"buffer":4}],38:[function(require,module,exports){
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_14984f.js","/")
+},{"./main.js":41,"1YiZ5S":8,"buffer":4}],41:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*
 *  GeoSpockWeb SDK.
@@ -5737,45 +6052,45 @@ if (typeof global.window.define === 'function' && global.window.define.amd) {
 /**
  * main sdk
  */
-module.exports = function() {
-  'use strict';
-  
-  var rest = require('rest');
-  var console = require("console-browserify");
+// module.exports = {
+//   init: function() {}
+// };
 
-  root.GeoSpockWeb = root.GeoSpockWeb || {};
+module.exports = function(serverUrl, collideKey) {
+  'use strict';
+
+  if (!serverUrl || !collideKey) {
+    throw new Error('serverUrl and collideKey are mandatory');
+  }
+
+  this.serverUrl = serverUrl;
+  this.collideKey = collideKey;
+
   var BASE_PATH = "/_ah/api/locatables/v2";
   var INT_MAX = 2147483647;
+  var rest = require('rest');
+  var console = require("console-browserify");
+  var pathPrefix = require('rest/interceptor/pathPrefix');
+  var defaultRequest = require('rest/interceptor/defaultRequest');
 
-  /**
-  * Contains all GeoSpockWeb API classes and functions.
-  * @name GeoSpockWeb
-  * @namespace
-  *
-  * Contains all GeoSpockWeb API classes and functions.
-  */
-  var GeoSpockWeb = root.GeoSpockWeb;
 
-    // Set the server for GeoSpockWeb to talk to.
-    // GeoSpockWeb.serverURL = "https://en.wikipedia.org";
+  // exposes low level
+  this.rest = rest;
 
-    /**
-     * Call this method first to set your authentication key.
-     * @param {String} API Token
-     */
-    // GeoSpockWeb.init = function(serverUrl, collideKey) {
-    //   GeoSpockWeb.serverUrl = serverUrl;
-    //   GeoSpockWeb.CollideKey = collideKey;
-    //
-    //   // Set ajax defaults
-    //   root.$.ajaxSetup({
-    //     url: serverUrl + BASE_PATH,
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'CollideKey': collideKey
-    //     }
-    //   });
-    // };
+  // For some reason this code breaks the tests. For now we are using rest
+  // without wraps which is a really petty as we are loosing all the REST.js
+  // benefits, but until we cannot fix the tests, we don't have other alternatives.
+  this.client = rest
+    .wrap(defaultRequest, {
+      headers: {
+        'Content-Type': 'application/json',
+        'CollideKey': collideKey
+      }
+    })
+    .wrap(pathPrefix, { prefix: serverUrl + BASE_PATH });
+
+};
+
 
     /**
      * http://docs.geospock.apiary.io/#reference/locatables/uploading-data/create-new-locatables
@@ -5843,7 +6158,7 @@ module.exports = function() {
     //   });
     // };
 
-};
+//};
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/main.js","/")
-},{"1YiZ5S":8,"buffer":4,"console-browserify":1,"rest":12}]},{},[37])
+},{"1YiZ5S":8,"buffer":4,"console-browserify":1,"rest":12,"rest/interceptor/defaultRequest":17,"rest/interceptor/pathPrefix":18}]},{},[40])

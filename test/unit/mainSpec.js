@@ -9,23 +9,10 @@
 
     beforeEach(function() {
       jasmine.Ajax.install();
-
-      // // sinon.config = {
-      // //   useFakeServer: sinon.fakeServerWithClock
-      // // };
-      // xhr = sinon.useFakeXMLHttpRequest();
-      // requests = [];
-      // xhr.onCreate = function (req) { requests.push(req); };
-
-      // var testData = { foo: 'bar', name: 'phil' };
-      // this.server = sinon.fakeServer.create();
-      // this.server.respondWith("GET", "/api/testmodel/1", [200, { "Content-Type": "application/json" }, JSON.stringify(testData)]);
     });
 
     afterEach(function() {
       jasmine.Ajax.uninstall();
-      // xhr.restore();
-      // this.server.restore();
     });
 
     describe("GeoSpockWeb object", function () {
@@ -53,187 +40,6 @@
         expect(function() {new GeoSpockWeb(null, null)}).toThrow(new Error("serverUrl and collideKey are mandatory"));
       });
 
-
-    //   it('The Other Fake', function(done){
-    //     jasmine.Ajax.install();
-    //
-    //   //  var doneFn = jasmine.createSpy("success");
-    //
-    //     // jasmine.Ajax.stubRequest('/another/url').andReturn({
-    //     //   "responseText": 'immediate response'
-    //     // });
-    //
-    //
-    //
-    //
-    //   var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
-    //
-    //
-    //
-    //   geoSpockWeb
-    // //    .client('/')
-    //     .rest('/')
-    //     .then(function(response) {
-    //       console.log("11111111111111  " + JSON.stringify(response));
-    //       //
-    //       // var request = jasmine.Ajax.requests.mostRecent();
-    //       //
-    //       // expect(request.url).toContain(serverUrl);
-    //       done();
-    //     }, function(response) {
-    //       console.log("44444444444  " + JSON.stringify(response));
-    //       //
-    //       // var request = jasmine.Ajax.requests.mostRecent();
-    //       //
-    //       // expect(request.url).toContain(serverUrl);
-    //       done();
-    //     })
-    //     .catch(function(response) {
-    //       console.log("222222222222222 " + JSON.stringify(response));
-    //
-    //       expect(JSON.stringify(response)).toBe(undefined);
-    //       done();
-    //     });
-    //
-    //     console.log("33333 " + JSON.stringify(jasmine.Ajax.requests.mostRecent()));
-    //
-    //
-    //
-    //
-    //
-    //
-    //     //
-    //     // var oReq = new XMLHttpRequest();
-    //     //
-    //     // oReq.onreadystatechange = function() {
-    //     //   console.log('FAKE SERVER >> ' + oReq.readyState + " -> " + oReq.status + " -> " + JSON.stringify(oReq));
-    //     //   if (oReq.readyState==4) done();
-    //     // }
-    //     //
-    //     // oReq.open('GET', '/another/url');
-    //     // oReq.send();
-    //     //
-    //     // console.log('FAKE SERVER >> -- <<' + JSON.stringify(jasmine.Ajax.requests.mostRecent()));
-    //     //
-    //     // console.log(jasmine.Ajax.requests.mostRecent().response);
-    //     // console.log(jasmine.Ajax.requests.mostRecent().respondWith);
-    //
-    //
-    //
-    //
-    //     jasmine.Ajax.requests.mostRecent().respondWith({
-    //       "status": 200,
-    //       "contentType": 'text/plain',
-    //       "responseText": 'awesome response'
-    //     });
-    //
-    //
-    //
-    //     console.log('FAKE SERVER >> -- <<' + JSON.stringify(jasmine.Ajax.requests.mostRecent()));
-    //
-    //
-    //
-    //
-    //
-    //
-    //   });
-
-
-
-
-      // it('FAKE SERVER SINON', function(done) {
-      //
-      //
-      //   var oReq = new XMLHttpRequest();
-      //   oReq.onreadystatechange = function() {
-      //     console.log('FAKE SERVER >> ' + oReq.readyState + " -> " + oReq.status + " -> " + JSON.stringify(oReq));
-      //     if (oReq.readyState==4) done();
-      //   }
-      //   try {
-      //     oReq.open('GET', '/api/testmodel/1');
-      //     oReq.send();
-      //   }
-      //   catch (ex) {
-      //     console.log('FAKE SERVER >> ' + ex);
-      //   }
-      //
-      //   console.log('FAKE SERVER >> -- <<');
-      //
-      //
-      //
-      //
-      //   // var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
-      //   // geoSpockWeb
-      //   //   .client('/')
-      //   //   .then(function(response) {
-      //   //     console.log("11111111111111  " + JSON.stringify(response));
-      //   //     //
-      //   //     // var request = jasmine.Ajax.requests.mostRecent();
-      //   //     //
-      //   //     // expect(request.url).toContain(serverUrl);
-      //   //     done();
-      //   //   })
-      //   //   .catch(function(response) {
-      //   //     console.log("222222222222222 " + JSON.stringify(response));
-      //   //
-      //   //     expect(JSON.stringify(response)).toBe(undefined);
-      //   //     done();
-      //   //   });
-      //   //
-      //   //   console.log("33333 ");
-      //
-      //
-      // });
-
-
-
-
-
-
-      // it('sets ajax default url', function(done) {
-      //   var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
-      //
-      //   geoSpockWeb
-      //     .client({ method: 'GET', entity: 'defaulted' })
-      //     .then(function(response) {
-      //       console.log("11111111111111  " + JSON.stringify(response));
-      //
-      //       var request = jasmine.Ajax.requests.mostRecent();
-      //
-      //       expect(request.url).toContain(serverUrl);
-      //       done();
-      //     })
-      //     .catch(function(response) {
-      //       console.log("222222222222222 " + JSON.stringify(response));
-      //
-      //       expect(JSON.stringify(response)).toBe(undefined);
-      //       done();
-      //     });
-      //
-      //     console.log("333333333");
-      //
-      //
-      //
-      // });
-
-      //
-      // it('sets ajax default url', function() {
-      //   GeoSpockWeb.init(serverUrl,collideKey);
-      //   var url = $.ajaxSetup();
-      //   expect($.ajaxSetup().url).toContain(serverUrl);
-      // });
-      //
-      // it('should inizialize the ajax header with the token in CollideKey', function() {
-      //   GeoSpockWeb.init(serverUrl,collideKey);
-      //   var url = $.ajaxSetup();
-      //   expect($.ajaxSetup().headers.CollideKey).toBe(collideKey);
-      // });
-      //
-      // it('should inizialize the ajax header with the content type', function() {
-      //   GeoSpockWeb.init(serverUrl,collideKey);
-      //   var url = $.ajaxSetup();
-      //   expect($.ajaxSetup().headers['Content-Type']).toBe('application/json');
-      // });
     });
 
     describe("GeoSpockWeb.post", function() {
@@ -411,47 +217,55 @@
         expect(request.params).toEqual(DATA);
       });
 
-
     });
 
 
 
-    // describe("GeoSpockWeb.delete", function() {
-    //   it("should be defined", function () {
-    //     expect(GeoSpockWeb.delete).toBeDefined();
-    //   });
-    //
-    //   it('should default type to 0', function() {
-    //     var ID = 1234;
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     GeoSpockWeb.delete(ID);
-    //
-    //     var request = jasmine.Ajax.requests.mostRecent();
-    //     expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
-    //   });
-    //
-    //   it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //     var TYPE = 3000000000;
-    //     var ID = 1234;
-    //
-    //     GeoSpockWeb.delete(ID, TYPE)
-    //       .fail(function() {
-    //         done();
-    //         expect(true).toBe(true);
-    //       });
-    //   });
-    //
-    //   it('should fail if the ID is not defined', function(done) {
-    //     GeoSpockWeb.init(serverUrl,collideKey);
-    //
-    //     GeoSpockWeb.delete()
-    //       .fail(function() {
-    //         done();
-    //         expect(true).toBe(true);
-    //       });
-    //   });
-    // });
+    describe("GeoSpockWeb.delete", function() {
+      it('should be defined', function() {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        expect(geoSpockWeb.delete).toBeDefined();
+      });
+
+      it('should default type to 0', function() {
+        var ID = 1234;
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        geoSpockWeb.delete(ID);
+
+        var request = jasmine.Ajax.requests.mostRecent();
+        expect(request.url.slice(-3-("" + ID).length )).toBe("/0/"+ ID);
+      });
+
+      it('should fail if the type is > 2,147,483,647 (INT_MAX)', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+        var TYPE = 3000000000;
+        var ID = 1234;
+
+        geoSpockWeb.delete(ID, TYPE)
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('type parameter cannot be bigger than 2147483647');
+            done();
+          });
+      });
+
+      it('should fail if the id is not defined', function(done) {
+        var geoSpockWeb = new GeoSpockWeb(serverUrl ,collideKey);
+
+        geoSpockWeb.delete()
+          .then(function(result) {
+            expect(result).toBe('failed');
+            done();
+          })
+          .catch(function(result) {
+            expect(result).toBe('id parameter is mandatory.');
+            done();
+          });
+      });
+    });
 
   });
 

@@ -8394,7 +8394,7 @@ if (typeof global.window.define === 'function' && global.window.define.amd) {
   global.window.GeoSpockWeb = GeoSpockWeb;
 }
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_cda5bf2c.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_79408e4f.js","/")
 },{"./main.js":59,"1YiZ5S":8,"buffer":4}],59:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*
@@ -8408,10 +8408,6 @@ if (typeof global.window.define === 'function' && global.window.define.amd) {
 /**
  * main sdk
  */
-// module.exports = {
-//   init: function() {}
-// };
-
 module.exports = function(serverUrl, collideKey) {
   'use strict';
 
@@ -8517,6 +8513,27 @@ module.exports = function(serverUrl, collideKey) {
     });
   };
 
+  /**
+   * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/delete-a-single-locatable
+   */
+  this.delete = function(id, _type) {
+    var type = _type || 0;
+
+    if (!id) {
+      return when.reject('id parameter is mandatory.');
+    }
+
+    if (type > INT_MAX) {
+      return when.reject('type parameter cannot be bigger than ' + INT_MAX);
+    }
+
+    return rest({
+      headers: headers,
+      method: 'DELETE',
+      path: prefix + "/" + type + "/" + id
+    });
+  };
+
 };
 
 
@@ -8524,21 +8541,7 @@ module.exports = function(serverUrl, collideKey) {
 
 
 
-    /**
-     * http://docs.geospock.apiary.io/#reference/locatables/single-locatable-object/delete-a-single-locatable
-     */
-    // GeoSpockWeb.delete = function(id, type) {
-    //   var type = type || 0;
-    //
-    //   if (!id || type > INT_MAX) {
-    //     return root.$.Deferred().reject();
-    //   }
-    //
-    //   return root.$.ajax({
-    //     url: root.$.ajaxSettings.url + "/" + type + "/" + id,
-    //     method: 'DELETE'
-    //   });
-    // };
+
 
 //};
 

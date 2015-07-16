@@ -21,7 +21,6 @@
   ],
   "devDependencies": {
     "del": "^1.2.0",
-    "fakerest": "^1.0.1",
     "gulp": "^3.9.0",
     "gulp-browserify": "^0.5.1",
     "gulp-bump": "^0.3.1",
@@ -55,7 +54,6 @@
     "karma-phantomjs-launcher": "^0.2.0",
     "phantomjs": "^1.9.17",
     "run-sequence": "^1.1.1",
-    "sinon": "^1.15.4",
     "xml2js": "^0.4.9",
     "yargs": "^3.15.0"
   },

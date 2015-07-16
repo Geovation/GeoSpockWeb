@@ -92,7 +92,7 @@
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.method).toBe('POST');
-        expect(request.params).toEqual(DATA);
+        expect(JSON.parse(request.params)).toEqual(DATA);
       });
     });
 
@@ -214,7 +214,7 @@
 
         var request = jasmine.Ajax.requests.mostRecent();
         expect(request.method).toBe('PUT');
-        expect(request.params).toEqual(DATA);
+        expect(JSON.parse(request.params)).toEqual(DATA);
       });
 
     });

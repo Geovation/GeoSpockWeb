@@ -63,7 +63,7 @@ module.exports = function(serverUrl, collideKey) {
       headers: headers,
       method: 'POST',
       path: prefix + "/" + type,
-      entity: data
+      entity: JSON.stringify(data)
     });
   };
 
@@ -110,7 +110,7 @@ module.exports = function(serverUrl, collideKey) {
       headers: headers,
       method: 'PUT',
       path: prefix + "/" + type + "/" + id,
-      entity: data
+      entity: JSON.stringify(data)
     });
   };
 

@@ -8,58 +8,57 @@ This SDK is a wrapper around JQuery.ajax (see http://api.jquery.com/jquery.ajax/
 * ```bower install GeoSpockWeb```
 
 ### 2. Usage
-* Add it and its dependencies (JQuery) to your site
+* Add it to your site
 ```
-<script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/GeoSpockWeb/dist/geospockweb.min.js"></script>
 ```
-* Initialize it
+* Instantiate it
 ```
-GeoSpockWeb.init(serverUrl, apiKey);
+var geoSpockWeb = new GeoSpockWeb(serverUrl, apiKey);
 ```
 * GET
 ```
-GeoSpockWeb
+geoSpockWeb
   .get(id, type)
   .then(function(response) {
-    console.log("Response from the server: " + response);
+    console.log("Response from the server: " + JSON.stringify(response));
   })
   .fail(function(response){
-    console.log("Something went wrong doing get: " + response);
+    console.log("Something went wrong doing get: " + JSON.stringify(response));
   });
 ```
 * POST
 ```
-GeoSpockWeb
+geoSpockWeb
   .post(data, type)
   .then(function(response) {
-    console.log("Response from the server: " + response);
+    console.log("Response from the server: " + JSON.stringify(response));
     });
   })
   .fail(function(response){
-    console.log("Something went wrong doing get: " + response);
+    console.log("Something went wrong doing get: " + JSON.stringify(response));
   });
 ```
 * PUT
 ```
-GeoSpockWeb
+geoSpockWeb
   .put(id, data, type)
   .then(function(response) {
-    console.log("Response from the server: " + response);
+    console.log("Response from the server: " + JSON.stringify(response));
   })
   .fail(function(response){
-    console.log("Something went wrong doing get: " + response);
+    console.log("Something went wrong doing get: " + JSON.stringify(response));
   });
 ```
 * DELETE
 ```
-GeoSpockWeb
+geoSpockWeb
   .delete(id, type)
   .then(function(response) {
-    console.log("Response from the server: " + response);
+    console.log("Response from the server: " + JSON.stringify(response));
   })
   .fail(function(response){
-    console.log("Something went wrong doing get: " + response);
+    console.log("Something went wrong doing get: " + JSON.stringify(response));
   });
 ```
 
